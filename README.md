@@ -9,3 +9,5 @@ Supporting that optimism is this repo's intent.
 3. collect ideas and designs
 4. match designs to available hardware and skills
 5. ancillary measuring equipment - oximeter, pulse rate, ???
+
+Righto, move on, nothing to see here. https://www.agorize.com/en/challenges/code-life-challenge
