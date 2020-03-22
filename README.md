@@ -1,6 +1,6 @@
 # breather - ventilators for the masses
 
-By now it must have crossed peoples's minds that (a) ventilators might be in high demand sometime soon and (b) cobbling something together can't be all that hard...
+By now it must have crossed peoples's minds that (a) ventilators might be in high demand sometime soon and (b) cobbling something together to help people breathe can't be all that hard...
 
 Supporting that optimism is this repo's intent.
 
