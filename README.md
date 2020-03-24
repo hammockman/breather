@@ -7,3 +7,5 @@ https://www.agorize.com/en/challenges/code-life-challenge. We are now
 Shall we continue to use this repo for development?
 
 yup, if android client ok.
+
+Seems to work fine on Android. happy to keep using this
