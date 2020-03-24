@@ -8,4 +8,4 @@ Shall we continue to use this repo for development?
 
 yup, if android client ok.
 
-Seems to work fine on Android. happy to keep using this
+Seems to work fine on Android. happy to keep using this. Am now using Mgit and Viper edit
