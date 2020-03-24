@@ -5,3 +5,5 @@ https://www.agorize.com/en/challenges/code-life-challenge. We are now
 "participating" in a team called Manawa Ora. Quite high-falutin but hey.
 
 Shall we continue to use this repo for development?
+
+yup, if android client ok.
