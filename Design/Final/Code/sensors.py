@@ -37,12 +37,6 @@ except:
 # if it turns out sensors are slow/variable to read then this plan will change
 __all__ = ["read_all", "Sensors"] 
 
-def read_word_2c(adr):
-    val = read_word(adr)
-    if (val >= 0x8000):
-        return -((0xffff - val) + 1)
-    else:
-        return val
 
 
 def twos_compliment(val):
@@ -51,6 +45,7 @@ def twos_compliment(val):
     else:
         return val
 
+    
 def get_word(array, index, twos):
     val = (array[index] << 8) + array[index+1]
     if twos:
@@ -58,24 +53,31 @@ def get_word(array, index, twos):
     else:
         return val
 
-
-def read_hmb085(address=0x77):
+def read_hmb085(address):
 
     import time
 
     bus = smbus.SMBus(1) # or bus = smbus.SMBus(1) if you have a revision 2 board 
 
-    def read_byte(adr):
-        return bus.read_byte_data(address, adr)
-
+    def read_byte(offset):
+        return bus.read_byte_data(address, offset)
+    
     def read_word(adr):
         high = bus.read_byte_data(address, adr)
         low = bus.read_byte_data(address, adr+1)
         val = (high << 8) + low
         return val
 
-    def write_byte(adr, value):
-        bus.write_byte_data(address, adr, value)
+    def read_word_2c(adr):
+        val = read_word(adr)
+        if (val >= 0x8000):
+            return -((0xffff - val) + 1)
+        else:
+            return val
+
+    def write_byte(offset, value):
+        bus.write_byte_data(address, offset, value)
+
 
     calibration = bus.read_i2c_block_data(address, 0xAA, 22)
     oss = 0
@@ -134,7 +136,7 @@ def read_hmb085(address=0x77):
     x1 = int(x1 * 3038) >> 16 ; #print("x1 = ",x1)
     x2 = int(-7357 * p) >> 16 ; #print("x2 = ",x2)
     p = p + (int(x1 + x2 + 3791) >> 4) ; #print("pressure = ",p,"Pa")
-
+    
     return p, t
 
 
@@ -184,5 +186,6 @@ class SensorsThread(threading.Thread):
 
             
 if __name__=="__main__":
-    T = SensorsThread(fs=10)
+    #T = SensorsThread(fs=10, daemon=False)
+    print(read_hmb085(0x77))
         
