@@ -8,6 +8,15 @@ Threads:
 3. messaging: MQTT handling
 
 
+Ventilator Modes:
+
+AC (CMV) - assist control (continuous mandatory ventilation). Fixed volume. Patient triggered with time based override. Monitor pressure. Alarms: high peak pressure, high plateau pressure
+PC - pressure control. Fixed pressure. Patient or time triggered. Monitor volume.
+CPAP, PEEP - continuous pressure , positive end expiratory pressure
+PS - pressure support. Specific pressure for each Inhalation only. Patient triggered.
+
+8mg/kg ideal body weight
+
 Qns:
 
 * can gpio be accessed from multiple threads?
@@ -22,6 +31,11 @@ from time import sleep
 subscribe_to_topics = {
     # topic: (default_value, on_message_callback_function_name)
     'breathe/runstate': ('run', 'runstate'), # run, pause, quit
+    'breathe/runmode': ('AC', 'runmode'), # AC=CMV, PC, ...
+    'breathe/fio2': (0.5, 'fio2'), # fraction inAC=CMV, PC, ...
+    'breathe/tv': (550, 'tv'), # tidal volume
+    'breathe/rate': (, 'rate'), # backup breathing rate
+    'breathe/peep': (5, 'rate'), # mmH20 positive end expiratory pressure
 }
 
 M = MessagingThread(subscribe_to_topics)
