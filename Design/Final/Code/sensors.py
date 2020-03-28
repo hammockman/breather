@@ -35,6 +35,8 @@ except:
 import collections
 import time
 
+from pidf import PIDF
+
 # at the moment I'm hoping to simply grab everything once per control loop
 # if it turns out sensors are slow/variable to read then this plan will change
 __all__ = ["read_all", "Sensors"] 
@@ -47,7 +49,6 @@ def twos_compliment(val):
     else:
         return val
 
-    
 def get_word(array, index, twos):
     val = (array[index] << 8) + array[index+1]
     if twos:
@@ -169,8 +170,11 @@ def read_all():
 class SensorsThread(threading.Thread):
     def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11):
         threading.Thread.__init__(self)
+        self.p_set_point = 0
+        self.pidf = PIDF(1.0, 0, 0, 0)
         self.stopped = threading.Event()
         self.delay = timedelta(seconds=(max(0, 1./fs - read_all_duration)))
+        print(self.delay)
         self.samples_recv = 0
         self.current_values = collections.deque(maxlen=maxnvalues)
         self.daemon = daemon # if set auto-terminate when main thread exits
@@ -186,7 +190,8 @@ class SensorsThread(threading.Thread):
         while not self.stopped.wait(self.delay.total_seconds()):
             self.current_values.append(read_all())
             self.samples_recv += 1
-            
+            u = self.pidf.calc_output(self.current_values[-1]['p_h'], self.p_set_point)
+            send
             #if self.samples_recv%(self.current_values.maxlen//2)==0:
             #    import pandas as pd
             #    print(pd.DataFrame(self.current_values)['t'].diff())
