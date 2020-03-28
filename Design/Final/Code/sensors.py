@@ -116,8 +116,8 @@ def read_hmb085(address):
     x1 = ((temp_raw - ac6) * ac5) / 32768
     x2 = (mc * 2048) / (x1 + md)
     b5 = x1 + x2
-    t = (b5 + 8) / 16
-    #print("Temp: ", t / 10.0, "degrees C")
+    t = (b5 + 8) / 160 # Print statement below used to have a /10
+    #print("Temp: ", t, "degrees C")
 
     b6 = b5 - 4000 ; #print("b6 = ", b6)
     x1 = int(b2 * int(b6 * b6) >> 12) >> 11 ; #print("x1 = ",x1)
