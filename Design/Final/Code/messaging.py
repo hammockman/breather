@@ -50,7 +50,8 @@ class MessagingThread(threading.Thread):
         self.client.on_message = self.on_message
         #self.client.on_publish = self.on_publish
         for topic, (_, callback_name) in subscribe_to_topics.items():
-            self.client.message_callback_add(topic, getattr(self, 'on_message_'+callback_name))
+            if callback_name is not None:
+                self.client.message_callback_add(topic, getattr(self, 'on_message_'+callback_name))
         self.messages_recv = 0
         self.messages = {}
         self.client.connect("localhost", 1883, 60)

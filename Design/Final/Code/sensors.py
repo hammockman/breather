@@ -32,6 +32,8 @@ try:
     import smbus
 except:
     import fakesmbus as smbus
+import collections
+import time
 
 # at the moment I'm hoping to simply grab everything once per control loop
 # if it turns out sensors are slow/variable to read then this plan will change
@@ -150,7 +152,8 @@ def read_all():
     p_h, t_h = read_hmb085(address=0x77)
     
     return {
-        'q_h':random(),
+        't': time.time(),
+        'q_h':None,
         'q_l':None,
         'p_h':p_h, 
         'p_l':None,
@@ -164,12 +167,12 @@ def read_all():
 
 
 class SensorsThread(threading.Thread):
-    def __init__(self, fs=10, daemon=True):
+    def __init__(self, fs=10, daemon=True, maxnvalues=100):
         threading.Thread.__init__(self)
         self.stopped = threading.Event()
         self.delay = timedelta(seconds=1./fs)
         self.samples_recv = 0
-        self.current_values = None
+        self.current_values = collections.deque(maxlen=maxnvalues)
         self.daemon = daemon # if set auto-terminate when main thread exits
         self.start()
 
@@ -181,8 +184,9 @@ class SensorsThread(threading.Thread):
         
     def run(self):
         while not self.stopped.wait(self.delay.total_seconds()):
-            self.current_values = read_all()
+            self.current_values.append(read_all())
             self.samples_recv += 1
+            #if self.samples_recv%30==0: print(self.current_values)
 
             
 if __name__=="__main__":
