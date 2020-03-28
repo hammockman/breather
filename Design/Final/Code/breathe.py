@@ -39,7 +39,7 @@ subscribe_to_topics = {
 }
 
 M = MessagingThread(subscribe_to_topics)
-S = SensorsThread()
+S = SensorsThread(fs=5, maxnvalues=25) # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
 nbreaths = 0
 while True: # main control loop
     nbreaths += 1

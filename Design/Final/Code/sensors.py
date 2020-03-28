@@ -144,7 +144,7 @@ def read_hmb085(address):
 
 def read_all():
 
-    from time import sleep
+    #from time import sleep
     #sleep(0.05) # hopefully 50ms is an over-estimate of the time it'll take to readout all the sensor info
     #from random import random
 
@@ -167,10 +167,10 @@ def read_all():
 
 
 class SensorsThread(threading.Thread):
-    def __init__(self, fs=10, daemon=True, maxnvalues=100):
+    def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11):
         threading.Thread.__init__(self)
         self.stopped = threading.Event()
-        self.delay = timedelta(seconds=1./fs)
+        self.delay = timedelta(seconds=(max(0, 1./fs - read_all_duration)))
         self.samples_recv = 0
         self.current_values = collections.deque(maxlen=maxnvalues)
         self.daemon = daemon # if set auto-terminate when main thread exits
@@ -186,7 +186,10 @@ class SensorsThread(threading.Thread):
         while not self.stopped.wait(self.delay.total_seconds()):
             self.current_values.append(read_all())
             self.samples_recv += 1
-            #if self.samples_recv%30==0: print(self.current_values)
+            
+            #if self.samples_recv%(self.current_values.maxlen//2)==0:
+            #    import pandas as pd
+            #    print(pd.DataFrame(self.current_values)['t'].diff())
 
             
 if __name__=="__main__":
