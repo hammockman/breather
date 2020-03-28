@@ -164,13 +164,13 @@ def read_all():
 
 
 class SensorsThread(threading.Thread):
-    def __init__(self, fs=10):
+    def __init__(self, fs=10, daemon=True):
         threading.Thread.__init__(self)
         self.stopped = threading.Event()
         self.delay = timedelta(seconds=1./fs)
         self.samples_recv = 0
         self.current_values = None
-        self.daemon = True # set this to terminate when main program exits
+        self.daemon = daemon # if set auto-terminate when main thread exits
         self.start()
 
         

@@ -32,10 +32,10 @@ subscribe_to_topics = {
     # topic: (default_value, on_message_callback_function_name)
     'breathe/runstate': ('run', 'runstate'), # run, pause, quit
     'breathe/runmode': ('AC', 'runmode'), # AC=CMV, PC, ...
-    'breathe/fio2': (0.5, 'fio2'), # fraction inAC=CMV, PC, ...
-    'breathe/tv': (550, 'tv'), # tidal volume
-    'breathe/rate': (, 'rate'), # backup breathing rate
-    'breathe/peep': (5, 'rate'), # mmH20 positive end expiratory pressure
+    'breathe/fio2': (0.5, 'fio2'), # fraction inspired oxygen 
+    'breathe/tv': (550, 'tv'), # ml; tidal volume
+    'breathe/rate': (16, 'rate'), # min^-1; backup breathing rate
+    'breathe/peep': (5, 'rate'), # mmH20; positive end expiratory pressure
 }
 
 M = MessagingThread(subscribe_to_topics)
