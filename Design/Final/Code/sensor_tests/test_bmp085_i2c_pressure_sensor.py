@@ -1,4 +1,9 @@
 #!/usr/bin/python
+
+import sys
+sys.path.append('../')
+from sensors import read_hmb085
+
 import smbus
 import time
 
@@ -87,7 +92,6 @@ print("Raw temp:", temp_raw)
 print("Raw pressure:", pressure_raw)
 
 
-
 #Calculate temperature
 x1 = ((temp_raw - ac6) * ac5) / 32768
 x2 = (mc * 2048) / (x1 + md)
@@ -115,3 +119,6 @@ x1 = int(x1 * 3038) >> 16 ; print("x1 = ",x1)
 x2 = int(-7357 * p) >> 16 ; print("x2 = ",x2)
 p = p + (int(x1 + x2 + 3791) >> 4) ; print("pressure = ",p,"Pa")
 
+
+p_h, t_h = read_hmb085(address=0x77)
+print("From sensors.py: %f Pa, %f degC " % (p_h, t_h))
