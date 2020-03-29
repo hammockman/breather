@@ -36,7 +36,7 @@ def deque2dict(q):
     if len(q)==0: return {}
     out = {k:[] for k in q[0].keys()}
     for k in out.keys():
-        for d in q:
+        for d in list(q):
             out[k].append(d[k])
     return out
         
