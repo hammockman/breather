@@ -128,6 +128,24 @@
               };
               Plotly.newPlot('temp-plot', plot, layout);
 
+
+              // humidity
+              var y = data.h_l;
+              var plot = [
+                  {
+                      x: t,
+                      y: y,
+                      type: 'scatter'
+                  }
+              ];
+              var layout = {
+                  yaxis: {
+                      title: "RH (%)",
+                  }
+                  ,margin: {l: 80, r:20, b:20, t:0, pad:0}
+              };
+              Plotly.newPlot('rh-plot', plot, layout);
+
           }
       }
 
