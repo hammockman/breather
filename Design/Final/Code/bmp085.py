@@ -4,13 +4,15 @@ try:
 except:
     import fakesmbus as smbus
 from utils import get_word, twos_compliment
-    
+
 class BMP085():
 
     def __init__(self, address):
         self.address = address
         self.bus = smbus.SMBus(1) # or bus = smbus.SMBus(1) if you have a revision 2 board 
 
+        self.p_amb = 987 # hPa or cm H20. Neee to get this from another sensor!
+        
         # Move this stuff out to init.
 
         calibration = self.bus.read_i2c_block_data(address, 0xAA, 22)
@@ -94,6 +96,6 @@ class BMP085():
         x1 = int(x1 * 3038) >> 16 ; #print("x1 = ",x1)
         x2 = int(-7357 * p) >> 16 ; #print("x2 = ",x2)
         p = p + (int(x1 + x2 + 3791) >> 4) ; #print("pressure = ",p,"Pa")
-        p = p/100 # hPa or cm H20
+        p = p/100 - self.p_amb # hPa or cm H20
         
         return p, t

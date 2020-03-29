@@ -79,13 +79,15 @@ class SensorsThread(threading.Thread):
         self.pidf = PIDF(0.5, 0, 0, 0.05)
         # 2 Hz.
         self.lpf_p = LPF([0.00355661, 0.00711322, 0.00355661], [ 1., -1.78994555,0.80417199])
+        self.i_valve_id = 0
+        self.e_valve_id = 2
         self.stopped = threading.Event()
         self.delay = timedelta(seconds=(max(0, 1./fs - read_all_duration)))
         print(self.delay)
         self.samples_recv = 0
         self.current_values = collections.deque(maxlen=maxnvalues)
         self.daemon = daemon # if set auto-terminate when main thread exits
-        self.valves = [LED(17)]
+        self.valves = [LED(17), LED(18), LED(22)]
         self.start()
 
     def stop(self):
@@ -95,25 +97,31 @@ class SensorsThread(threading.Thread):
     def send_to_valve(self, valve_id, signal):
         # Make some sort of PWM
         if signal > 0:
-            self.valves[valve_id-1].on()
+            self.valves[valve_id].on()
         else:
-            self.valves[valve_id-1].off()
+            self.valves[valve_id].off()
         
         
     def run(self):
         while not self.stopped.wait(self.delay.total_seconds()):
             self.current_values.append(read_all())
             self.samples_recv += 1
-            p_set_point_rl = self.rl_p_set_point.update(self.p_set_point)
-            p_h = self.lpf_p.update(self.current_values[-1]['p_h'])
-            u = self.pidf.calc_output(p_h - 988, p_set_point_rl)
+            #p_set_point_rl = self.rl_p_set_point.update(self.p_set_point)
+            p_set_point_rl = self.p_set_point
+            #p_h = self.lpf_p.update(self.current_values[-1]['p_h'])
+            p_h = self.current_values[-1]['p_h']
+            u = self.pidf.calc_output(p_h, p_set_point_rl)
             #print('%2.0f\t%2.0f\t%2.0f' % (self.p_set_point, self.current_values[-1]['p_h'] - 988, u))
-            print(' '*2*int(self.p_set_point) + 's')
-            print(' '*2*int(self.current_values[-1]['p_h'] - 988) + 'p')
+            #print(' '*2*int(self.p_set_point) + 's')
+            #print(' '*2*int(self.current_values[-1]['p_h']) + 'p')
             #print(' '*int(u) + 'u')
-            valve_id = 1
-            self.send_to_valve(valve_id, u)
-            #if self.samples_recv%(self.current_values.maxlen//2)==0:
+            self.send_to_valve(self.i_valve_id, u)
+            # Hacking completely:
+            if self.p_set_point < 10:
+                self.valves[self.e_valve_id].on()
+            else:
+                self.valves[self.e_valve_id].off()
+            #if self.samples_recv%(selfs.current_values.maxlen//2)==0:
             #    import pandas as pd
             #    print(pd.DataFrame(self.current_values)['t'].diff())
 
