@@ -31,7 +31,10 @@ from datetime import timedelta
 import collections
 import time
 
-from gpiozero import LED
+try:
+    from gpiozero import LED
+except:
+    from utils import fakeLED as LED
 
 from bmp085 import BMP085
 from pidf import PIDF
@@ -86,7 +89,7 @@ class SensorsThread(threading.Thread):
         self.stopped.set()
         self.join()
 
-    def send_to_valve(valve_id, signal):
+    def send_to_valve(self, valve_id, signal):
         # Make some sort of PWM
         if signal > 0:
             self.valves[valve_id-1].on()
@@ -99,7 +102,7 @@ class SensorsThread(threading.Thread):
             self.current_values.append(read_all())
             self.samples_recv += 1
             u = self.pidf.calc_output(self.current_values[-1]['p_h'], self.p_set_point)
-            self.send_to_valve(valve_id, u)
+            self.send_to_valve(0, u)
             #if self.samples_recv%(self.current_values.maxlen//2)==0:
             #    import pandas as pd
             #    print(pd.DataFrame(self.current_values)['t'].diff())

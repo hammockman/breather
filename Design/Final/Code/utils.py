@@ -34,7 +34,20 @@ def ibw2tv(ibw):
     """
     return 8*ibw # ml
     
-    
+class fakeLED():
+    """
+    Pretend to do whatever gpiozero.LED does.
+    """
+    def __init__(self, *args):
+        pass
+
+    def on(self):
+        pass
+
+    def off(self):
+        pass
+
+
 if __name__=="__main__":
     print(ibw2tv(height2ibw('m', 192)))
     print(ibw2tv(height2ibw('f', 192)))

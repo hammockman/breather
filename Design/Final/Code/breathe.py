@@ -27,6 +27,7 @@ jh, Mar 2020
 from messaging import MessagingThread
 from sensors import SensorsThread
 from time import sleep
+import json
 
 subscribe_to_topics = {
     # topic: (default_value, on_message_callback_function_name)
@@ -36,6 +37,8 @@ subscribe_to_topics = {
     'breathe/tv': (550, None), # ml; tidal volume
     'breathe/rate': (16, None), # min^-1; backup breathing rate
     'breathe/peep': (5, None), # mmH20; positive end expiratory pressure
+    'breathe/ieratio': (1, None), # in:exp-iration ratio
+    
 }
 
 M = MessagingThread(subscribe_to_topics)
@@ -45,6 +48,18 @@ inspiration = True
 
 p_i = 40
 p_e = 10
+
+
+def deque2dict(q):
+    """
+    render a collections.deque list-of-dicts as a dict-of-lists
+    """
+    out = {k:[] for k in q[0].keys()}
+    for k in out.keys():
+        for d in q:
+            out[k].append(d[k])
+    return out
+        
 
 nbreaths = 0
 while True: # main control loop
@@ -58,11 +73,9 @@ while True: # main control loop
     else:
         S.p_set_point = p_e
 
-    # publish sensor values etc
-    #for k, v in S.current_values[-1].items():
-    #    M.publish('breathe/sensors/'+k, v, retain=True)
+    # publish sensor values
+    M.publish('breathe/sensors/current', json.dumps(deque2dict(S.current_values)), retain=True)
     print(nbreaths, S.samples_recv, len(S.current_values))
-    
     M.publish('breathe/nbreaths', nbreaths, retain=True)
         
     # exit if instructed to
