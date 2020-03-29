@@ -5,6 +5,19 @@ jh, Mar 2020
 """
 
 
+def twos_compliment(val):
+    if (val >= 0x8000):
+        return -((0xffff - val) + 1)
+    else:
+        return val
+
+def get_word(array, index, twos):
+    val = (array[index] << 8) + array[index+1]
+    if twos:
+        return twos_compliment(val)
+    else:
+        return val
+
 def height2ibw(gender, height_cm):
     """Compute Ideal Body Weight from patient height.
 

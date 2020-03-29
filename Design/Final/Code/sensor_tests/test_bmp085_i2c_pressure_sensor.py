@@ -2,7 +2,7 @@
 
 import sys
 sys.path.append('../')
-from sensors import read_hmb085
+from bmp085 import BMP085
 
 import smbus
 import time
@@ -120,5 +120,6 @@ x2 = int(-7357 * p) >> 16 ; print("x2 = ",x2)
 p = p + (int(x1 + x2 + 3791) >> 4) ; print("pressure = ",p,"Pa")
 
 
-p_h, t_h = read_hmb085(address=0x77)
+pSensor = BMP085(address=0x77)
+p_h, t_h = pSensor.read()
 print("From sensors.py: %f Pa, %f degC " % (p_h, t_h))

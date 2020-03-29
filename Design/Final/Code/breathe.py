@@ -39,13 +39,14 @@ subscribe_to_topics = {
 }
 
 M = MessagingThread(subscribe_to_topics)
-S = SensorsThread(fs=5, maxnvalues=1, read_all_duration=.02) # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
-nbreaths = 0
+S = SensorsThread(fs=50, maxnvalues=100, read_all_duration=.02) # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
+
 inspiration = True
 
 p_i = 40
 p_e = 10
 
+nbreaths = 0
 while True: # main control loop
     nbreaths += 1
     inspiration = not inspiration
@@ -58,9 +59,10 @@ while True: # main control loop
         S.p_set_point = p_e
 
     # publish sensor values etc
-    for k, v in S.current_values[-1].items():
-        M.publish('breathe/sensors/'+k, v, retain=True)
+    #for k, v in S.current_values[-1].items():
+    #    M.publish('breathe/sensors/'+k, v, retain=True)
     print(nbreaths, S.samples_recv, len(S.current_values))
+    
     M.publish('breathe/nbreaths', nbreaths, retain=True)
         
     # exit if instructed to
