@@ -94,5 +94,6 @@ class BMP085():
         x1 = int(x1 * 3038) >> 16 ; #print("x1 = ",x1)
         x2 = int(-7357 * p) >> 16 ; #print("x2 = ",x2)
         p = p + (int(x1 + x2 + 3791) >> 4) ; #print("pressure = ",p,"Pa")
+        p = p/100 # hPa or cm H20
         
         return p, t

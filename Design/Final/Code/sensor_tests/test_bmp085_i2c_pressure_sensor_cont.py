@@ -15,6 +15,6 @@ while 1:
   p_h, t_h = pSensor.read()
   n = n + 1
   if t_sec != t_sec_old:
-    print("Time: %d s, fs=%f, p=%f Pa, T=%f degC " % (t_sec, n, p_h, t_h))
+    print("Time: %d s, fs=%f, p=%f cm, T=%f degC " % (t_sec, n, p_h - 988, t_h))
     t_sec_old = t_sec
     n = 0

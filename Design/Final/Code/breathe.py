@@ -29,27 +29,6 @@ from sensors import SensorsThread
 from time import sleep
 import json
 
-subscribe_to_topics = {
-    # topic: (default_value, on_message_callback_function_name)
-    'breathe/runstate': ('run', 'runstate'), # run, pause, quit
-    'breathe/runmode': ('AC', None), # AC=CMV, PC, ...
-    'breathe/fio2': (0.5, None), # fraction inspired oxygen 
-    'breathe/tv': (550, None), # ml; tidal volume
-    'breathe/rate': (16, None), # min^-1; backup breathing rate
-    'breathe/peep': (5, None), # mmH20; positive end expiratory pressure
-    'breathe/ieratio': (1, None), # in:exp-iration ratio
-    
-}
-
-M = MessagingThread(subscribe_to_topics)
-S = SensorsThread(fs=50, maxnvalues=100, read_all_duration=.02) # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
-
-inspiration = True
-
-p_i = 40
-p_e = 10
-
-
 def deque2dict(q):
     """
     render a collections.deque list-of-dicts as a dict-of-lists
@@ -60,24 +39,43 @@ def deque2dict(q):
             out[k].append(d[k])
     return out
         
+subscribe_to_topics = {
+    # topic: (default_value, on_message_callback_function_name)
+    'breathe/runstate': ('run', 'runstate'), # run, pause, quit
+    'breathe/runmode': ('AC', None), # AC=CMV, PC, ...
+    'breathe/fio2': (0.5, None), # fraction inspired oxygen 
+    'breathe/tv': (550, None), # ml; tidal volume
+    'breathe/rate': (16, None), # min^-1; backup breathing rate
+    'breathe/peep': (5, None), # mmH20; positive end expiratory pressure
+}
 
+M = MessagingThread(subscribe_to_topics)
+S = SensorsThread(fs=30, maxnvalues=100, read_all_duration=.02) # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
+
+inspiration = False
+
+p_i = 20
+p_e = 1
+S.p_set_point = p_i
+bpm = 5
 nbreaths = 0
 while True: # main control loop
     nbreaths += 1
     inspiration = not inspiration
     
     # todo: implement breathing 
-    sleep(5)
+    sleep(60/bpm/2)
     if inspiration:
         S.p_set_point = p_i
     else:
         S.p_set_point = p_e
 
-    # publish sensor values
     M.publish('breathe/sensors/current', json.dumps(deque2dict(S.current_values)), retain=True)
-    print(nbreaths, S.samples_recv, len(S.current_values))
+    #print(nbreaths, S.samples_recv, len(S.current_values))
     M.publish('breathe/nbreaths', nbreaths, retain=True)
-        
+    #print(nbreaths, S.current_values[-1].items()['h_p'])
+    #print(nbreaths)
+    
     # exit if instructed to
     if M.messages['breathe/runstate'] == 'quit':
         # todo: write current state for restore on restart

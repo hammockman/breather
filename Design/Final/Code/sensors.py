@@ -31,10 +31,7 @@ from datetime import timedelta
 import collections
 import time
 
-try:
-    from gpiozero import LED
-except:
-    from utils import fakeLED as LED
+from gpiozero import LED
 
 from bmp085 import BMP085
 from pidf import PIDF
@@ -73,18 +70,16 @@ class SensorsThread(threading.Thread):
     def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11):
         threading.Thread.__init__(self)
         self.p_set_point = 0
-        self.pidf = PIDF(1.0, 0, 0, 0)
+        self.pidf = PIDF(0.5, 0, 0, 0.05)
         self.stopped = threading.Event()
         self.delay = timedelta(seconds=(max(0, 1./fs - read_all_duration)))
         print(self.delay)
         self.samples_recv = 0
         self.current_values = collections.deque(maxlen=maxnvalues)
         self.daemon = daemon # if set auto-terminate when main thread exits
+        self.valves = [LED(17)]
         self.start()
 
-        self.valves = [LED(17)]
-
-        
     def stop(self):
         self.stopped.set()
         self.join()
@@ -101,8 +96,13 @@ class SensorsThread(threading.Thread):
         while not self.stopped.wait(self.delay.total_seconds()):
             self.current_values.append(read_all())
             self.samples_recv += 1
-            u = self.pidf.calc_output(self.current_values[-1]['p_h'], self.p_set_point)
-            self.send_to_valve(0, u)
+            u = self.pidf.calc_output(self.current_values[-1]['p_h'] - 988, self.p_set_point)
+            #print('%2.0f\t%2.0f\t%2.0f' % (self.p_set_point, self.current_values[-1]['p_h'] - 988, u))
+            print(' '*2*int(self.p_set_point) + 's')
+            print(' '*2*int(self.current_values[-1]['p_h'] - 988) + 'p')
+            #print(' '*int(u) + 'u')
+            valve_id = 1
+            self.send_to_valve(valve_id, u)
             #if self.samples_recv%(self.current_values.maxlen//2)==0:
             #    import pandas as pd
             #    print(pd.DataFrame(self.current_values)['t'].diff())

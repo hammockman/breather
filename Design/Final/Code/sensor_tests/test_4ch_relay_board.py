@@ -6,7 +6,7 @@ from time import sleep
 
 led = LED(17)
 
-fs = 1
+fs = .2
 
 while 1:
   led.on()
