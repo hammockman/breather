@@ -31,7 +31,10 @@ from datetime import timedelta
 import collections
 import time
 
-from gpiozero import LED
+try:
+    from gpiozero import LED
+except:
+    from utils import fakeLED as LED
 
 from bmp085 import BMP085
 from pidf import PIDF

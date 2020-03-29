@@ -14,11 +14,15 @@ body {
 }
 
 #center-panel {
-    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 10;
 }
 
 #left-panel {
-    flex-grow: 10;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
 }
 
 #right-panel {
@@ -35,6 +39,12 @@ body {
 
 fieldset {
     display: inline-block;
+}
+
+.myplot {
+    width: 100%;
+    height: 30%; 
+    flex-grow: 1;
 }
 
 /*
