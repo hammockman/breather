@@ -4,9 +4,9 @@
 from gpiozero import LED
 from time import sleep
 
-led = LED(17)
+led = LED(22)
 
-fs = .2
+fs = .1
 
 while 1:
   led.on()

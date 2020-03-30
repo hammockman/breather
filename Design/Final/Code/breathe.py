@@ -46,16 +46,16 @@ subscribe_to_topics = {
     #'breathe/runmode': ('AC', None), # AC=CMV, PC, ...
     #'breathe/inputs/fio2': (0.5, None), # fraction inspired oxygen 
     #'breathe/inputs/tv': (550, None), # ml; tidal volume
-    'breathe/inputs/bpm': (16, None), # min^-1; backup breathing rate
-    'breathe/inputs/inp': (40, None), # cmH20; inspiration pressure
-    'breathe/inputs/peep': (5, None), # cmH20; positive end expiratory pressure
+    'breathe/inputs/bpm': (8, None), # min^-1; backup breathing rate
+    'breathe/inputs/inp': (20, None), # cmH20; inspiration pressure
+    'breathe/inputs/peep': (2, None), # cmH20; positive end expiratory pressure
     'breathe/inputs/ieratio': (1, None), # ins:exp-iration ratio
     'breathe/inputs/patrigmode': (1, None), # can the patient trigger inspiration?
 }
 
 M = MessagingThread(subscribe_to_topics)
 print(M.messages)
-fs = 30
+fs = 30 # JH had 30
 maxnvalues = int(180*fs/5) # 5 bpm is as low as it'll ever go???
 S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02)
 # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
@@ -115,9 +115,9 @@ while True: # main control loop
             S.p_set_point = update_input('inp')
             continue
 
-
+    #print(nbreaths, ieratio)
     
     # go to sleep for a bit
-    sleep(60/bpm/5)
+    sleep(60/bpm/2) # was /5
         
 
