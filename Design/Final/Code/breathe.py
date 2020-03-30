@@ -75,7 +75,7 @@ nbreaths = 0
 t0 = time() # t0 tracks the start of inspiration
 inspiration = True
 S.p_set_point = update_input('inp')
-M.publish('breathe/runstate','run')
+M.publish('breathe/runstate','run'); sleep(2)
 while True: # main control loop
     if M.messages['breathe/runstate'] == 'pause': continue
     
