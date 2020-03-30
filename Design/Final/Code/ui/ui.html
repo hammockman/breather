@@ -10,25 +10,28 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
     <!-- Plotly: Latest compiled and minified plotly.js JavaScript -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js" charset="utf-8"></script>
+    <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
   </head>
   <body>
 
     <div id="viewport">
 
-      <div id="left-panel">
-        <fieldset><legend>breath rate (min-1)</legend><input type="text" id="bpm" onchange="publ(this)"></fieldset>
-        <fieldset><legend>inspiration pressure (cmH2O)</legend><input type="text" id="inp" onchange="publ(this)" ></fieldset>
-        <fieldset><legend>PEEP (cmH2O)</legend><input type="text" id="peep" onchange="publ(this)" ></fieldset>
-        <fieldset><legend>I:E ratio</legend><input type="text" id="ieratio" onchange="publ(this)" ></fieldset>
+      <div id="left-panel" class="panel">
+	<h1>Manawa Ora</h1>
+	<h3>Breathe (ver. 0.3)</h3>
+        <fieldset><legend>Breath rate (b.p.m.)</legend><input type="number" min="5" max="20" step="0.1" id="bpm" onchange="publ(this)" value="12"></fieldset>
+        <fieldset><legend>Inspiration pressure (cm H2O)</legend><input type="number" min="10" max="40" step="0.5" id="inp" onchange="publ(this)" value="20"></fieldset>
+        <fieldset><legend>Expiratory pressure (PEEP) (cmH2O)</legend><input type="number" min="1" max="10" step="0.2" id="peep" onchange="publ(this)" value="5"></fieldset>
+        <fieldset><legend>I:E ratio</legend><input type="number" min="0.2" max="2" step="0.1" id="ieratio" onchange="publ(this)" value="1.2"></fieldset>
         <!--<fieldset><legend>tidal volume (ml)</legend><input type="text" id="tv" onchange="publ(this)" ></fieldset>-->
-        <fieldset><legend>FiO2 (%)</legend><input type="text" id="fio2" onchange="publ(this)" ></fieldset>
-        <fieldset><legend>patient triggered</legend><input type="checkbox" id="patrigmode" onchange="publ(this)" ></fieldset>
+        <fieldset><legend>FiO2 (%)</legend><input type="number" min="22" max="100" step="5" id="fio2" onchange="publ(this)" value="22"></fieldset>
+        <fieldset><legend>Patient triggered</legend><input type="checkbox" id="patrigmode" onchange="publ(this)" ></fieldset>
         <!-- todo: alarm criteria -->
         <!-- todo: input validation -->
         <!-- todo: enum ctrls rather than continuous vars? e.g. FiO2 in (20,40,60,80,100) -->
       </div>
       
-      <div id="center-panel">
+      <div id="center-panel" class="panel">
         <div class="myplot" id="pressure-plot"></div>
         <div class="myplot" id="flow-plot"></div>
         <div class="myplot" id="volume-plot"></div>
@@ -37,17 +40,17 @@
         <div class="myplot" id="temp-plot"></div>
       </div>
 
-      <div id="right-panel">
+      <div id="right-panel" class="panel">
         <fieldset>
-          <legend>breath #</legend>
+          <legend>Breaths</legend>
           <div id="nbreaths">---</div>
         </fieldset>
         <fieldset>
-          <legend>bpm</legend>
+          <legend>Recorded breath rate (b.p.m.)</legend>
           <div id="bpm_out">---</div>
         </fieldset>
         <fieldset>
-          <legend>minute ventilation (ml/min)</legend>
+          <legend>Minute ventilation (ml/min)</legend>
           <div id="minvent">---</div>
         </fieldset>
         <fieldset>
@@ -121,7 +124,7 @@
               ];
               var layout = {
                   yaxis: {
-                      title: "pressure (cmH2O)",
+                      title: "Pressure (cm H2O)",
                   }
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
@@ -138,7 +141,7 @@
               ];
               var layout = {
                   yaxis: {
-                      title: "temp (degC)",
+                      title: "Temperature (degC)",
                   }
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
