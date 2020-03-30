@@ -28,6 +28,8 @@ from messaging import MessagingThread
 from sensors import SensorsThread
 from time import time, sleep
 import json
+import logging
+
 
 def deque2dict(q):
     """
@@ -68,32 +70,39 @@ flow_eps = 0. # the largest flow rate that should be considered "no flow"
 def update_input(i):
     pth = 'breathe/inputs/'+i
     if pth in M.messages and M.messages[pth] is not None:
-        print(i, pth, M.messages[pth])
+        #print(i, pth, M.messages[pth])
         return M.messages[pth]
     else:
+        #print('******** using default', i, pth, subscribe_to_topics[pth][0])
         return subscribe_to_topics[pth][0]
 
 
 nbreaths = 0
 t0 = time() # t0 tracks the start of inspiration
 inspiration = True
-S.p_set_point = update_input('inp')
+S.p_set_point = float(update_input('inp'))
 M.publish('breathe/runstate','run'); sleep(2)
 while True: # main control loop
     if M.messages['breathe/runstate'] == 'pause': continue
     
     # update control params based on current settings
     bpm = float(update_input('bpm'))
-    #p_i = update_input('inp')
-    #p_e = update_input('peep')
+    #p_i = float(update_input('inp'))
+    #p_e = float(update_input('peep'))
     ieratio = float(update_input('ieratio'))
-    patrigmode = update_input('patrigmode')
+    patrigmode = update_input('patrigmode') # 'on' or ?????
 
     # deal with accumulated sensor data
     sensor_current_values = deque2dict(S.current_values)
     M.publish('breathe/sensors/current', json.dumps(sensor_current_values), retain=True)
     M.publish('breathe/nbreaths', nbreaths, retain=True)
     M.publish('breathe/bpm', bpm, retain=True) # eventually this will become the TRUE instantaneous breath rate c.f. backup bpm
+
+    # check on bpm sanity
+    if bpm>20:
+        logging.warning('Requested bpm=%s > 20. Using bpm=20 instead', bpm)
+        bpm = 20
+
     
     # exit if instructed to
     if M.messages['breathe/runstate'] == 'quit':
@@ -107,7 +116,7 @@ while True: # main control loop
         if flow<flow_eps or t>t0 + 60/bpm/(1. + ieratio):
             # force change over from ins- to ex-piration
             inspiration = False
-            S.p_set_point = update_input('peep')
+            S.p_set_point = float(update_input('peep'))
     else: # we're in expiration phase
         # trigger a new breath?
         exp_pressure = sensor_current_values['p_h'][-1] # p_l doesn't exist
@@ -115,7 +124,7 @@ while True: # main control loop
             nbreaths += 1
             t0 = t
             inspiration = True
-            S.p_set_point = update_input('inp')
+            S.p_set_point = float(update_input('inp'))
             continue
 
     #print(nbreaths, ieratio)

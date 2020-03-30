@@ -25,7 +25,7 @@ class MessagingThread(threading.Thread):
         assert rc==0
         topics = []
         for topic, (default_value, _) in self.subscribe_to_topics.items():
-            topics.append( (topic, 0) )
+            topics.append( (topic, 0) ) # (topic, qos)
             self.messages[topic] = default_value # ensure every topic of interest has an initial value # FIXME: on RECONNECT we want to resume prev value not overwrite!!!
         #print(topics)
         #import pdb; pdb.set_trace()
@@ -36,12 +36,17 @@ class MessagingThread(threading.Thread):
         """
         Callback used for messages not dealt with by a topic specific handler
         """
-        print(msg.topic+": "+msg.payload)
+        #print(msg)
+        try:
+            content = msg.payload.decode('utf-8') # arrives as bytes
+        except:
+            content = msg.payload
+        print(msg.topic+": "+content)
         self.messages_recv += 1
-        self.messages[msg.topic] = msg.payload
+        self.messages[msg.topic] = content
 
 
-    def __init__(self, subscribe_to_topics={}):
+    def __init__(self, subscribe_to_topics={}, daemon=True):
         threading.Thread.__init__(self)
         self.subscribe_to_topics = subscribe_to_topics
         self.client = mqtt.Client(client_id="breathe.manawa-ora.org", clean_session=False, transport="tcp")
@@ -52,10 +57,13 @@ class MessagingThread(threading.Thread):
         for topic, (_, callback_name) in subscribe_to_topics.items():
             if callback_name is not None:
                 self.client.message_callback_add(topic, getattr(self, 'on_message_'+callback_name))
+            else:
+                self.client.message_callback_add(topic, self.on_message)
         self.messages_recv = 0
         self.messages = {}
-        self.client.connect("localhost", 1883, 60)
-        self.daemon = True  # set this to terminate when main program exits
+        #self.client.connect("localhost", 1883, 60)
+        self.client.connect("manawa-ora-1", 1883, 60)
+        self.daemon = daemon  # set this to terminate when main program exits
         self.start()
 
         
@@ -67,4 +75,17 @@ class MessagingThread(threading.Thread):
         self.client.publish(topic, payload, qos, retain)
 
 if __name__=="__main__":
-    T = MessagingThread()  # ^C can't kill this...
+
+    subscribe_to_topics = {
+    # topic: (default_value, on_message_callback_function_name)
+    'breathe/runstate': ('run', 'runstate'), # run, pause, quit
+    #'breathe/runmode': ('AC', None), # AC=CMV, PC, ...
+    #'breathe/inputs/fio2': (0.5, None), # fraction inspired oxygen 
+    #'breathe/inputs/tv': (550, None), # ml; tidal volume
+    'breathe/inputs/bpm': (8, None), # min^-1; backup breathing rate
+    'breathe/inputs/inp': (20, None), # cmH20; inspiration pressure
+    'breathe/inputs/peep': (2, None), # cmH20; positive end expiratory pressure
+    'breathe/inputs/ieratio': (1, None), # ins:exp-iration ratio
+    'breathe/inputs/patrigmode': (1, None), # can the patient trigger inspiration?
+}
+    T = MessagingThread(subscribe_to_topics, daemon=False)  # ^C can't kill this...

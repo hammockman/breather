@@ -169,6 +169,7 @@
           console.log(inp);
           msg = new Paho.MQTT.Message(inp.value);
           msg.destinationName = "breathe/inputs/"+inp.id;
+          msg.retained = true;
           console.log(msg);
           client.send(msg);
       }
