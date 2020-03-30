@@ -94,6 +94,7 @@
           console.log("onConnect");
           client.subscribe("breathe/nbreaths");
           client.subscribe("breathe/sensors/#");
+          client.subscribe("breathe/slow_sensors/#");
           client.subscribe("breathe/bpm");
       }
 
@@ -157,11 +158,20 @@
               Plotly.newPlot('temp-plot', plot, layout);
 
 
+          }
+	  
+	  if (message.destinationName == "breathe/slow_sensors/current") {
+
+	      // Why isn't data stacking up?
+              var sdata = JSON.parse(message.payloadString);
+              var st = sdata.t.map(a => a- Math.max(...sdata.t));
+
+              //todo: say goodbye to cut'n'paste
               // humidity
-              var y = data.h_h;
+              var y = sdata.h_h;
               var plot = [
                   {
-                      x: t,
+                      x: st,
                       y: y,
                       type: 'scatter'
                   }

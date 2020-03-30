@@ -35,10 +35,10 @@ body {
 }
 
 .output {
-    font-size: 64pt;
+    font-size: 200%;
     width: 4ex;
->>>>>>> Stashed changes
     height: 1em;
+}
 
 fieldset {
     background-color: white;
