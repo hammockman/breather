@@ -39,7 +39,9 @@ def deque2dict(q):
         for d in list(q):
             out[k].append(d[k])
     return out
-        
+
+# this is a list of messages that need to be READ
+# no need to include message that will be written
 subscribe_to_topics = {
     # topic: (default_value, on_message_callback_function_name)
     'breathe/runstate': ('run', 'runstate'), # run, pause, quit

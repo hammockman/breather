@@ -21,9 +21,11 @@
         <fieldset><legend>PEEP (cmH2O)</legend><input type="text" id="peep" onchange="publ(this)" ></fieldset>
         <fieldset><legend>I:E ratio</legend><input type="text" id="ieratio" onchange="publ(this)" ></fieldset>
         <!--<fieldset><legend>tidal volume (ml)</legend><input type="text" id="tv" onchange="publ(this)" ></fieldset>-->
-        <!--<fieldset><legend>FiO2 (%)</legend><input type="text" id="fio2" onchange="publ(this)" ></fieldset>-->
+        <fieldset><legend>FiO2 (%)</legend><input type="text" id="fio2" onchange="publ(this)" ></fieldset>
         <fieldset><legend>patient triggered</legend><input type="checkbox" id="patrigmode" onchange="publ(this)" ></fieldset>
         <!-- todo: alarm criteria -->
+        <!-- todo: input validation -->
+        <!-- todo: enum ctrls rather than continuous vars? e.g. FiO2 in (20,40,60,80,100) -->
       </div>
       
       <div id="center-panel">
@@ -39,6 +41,10 @@
         <fieldset>
           <legend>breath #</legend>
           <div id="nbreaths">---</div>
+        </fieldset>
+        <fieldset>
+          <legend>bpm</legend>
+          <div id="bpm">---</div>
         </fieldset>
         <fieldset>
           <legend>minute ventilation (ml/min)</legend>
@@ -88,6 +94,9 @@
               //var data = JSON.parse(message.payloadString);
               //$("#nbreaths").html(Math.round(data.value));
               $("#nbreaths").html(message.payloadString);
+          }
+          if (message.destinationName == "breathe/bpm") {
+              $("#bpm").html(message.payloadString);
           }
           if (message.destinationName == "breathe/sensors/current") {
               var data = JSON.parse(message.payloadString);
