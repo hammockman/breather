@@ -13,12 +13,58 @@
   </head>
   <body>
 
-    <div id="nbreaths"></div>
-    <div id="pressure-plot" style="width:600px;height:250px;"></div>
+    <div id="viewport">
 
+      <div id="left-panel">
+        <fieldset><legend>breath rate (min-1)</legend><input type="text" id="bpm" onchange="publ(this)"></fieldset>
+        <fieldset><legend>inspiration pressure (cmH2O)</legend><input type="text" id="inp" onchange="publ(this)" ></fieldset>
+        <fieldset><legend>PEEP (cmH2O)</legend><input type="text" id="peep" onchange="publ(this)" ></fieldset>
+        <fieldset><legend>I:E ratio</legend><input type="text" id="ieratio" onchange="publ(this)" ></fieldset>
+        <!--<fieldset><legend>tidal volume (ml)</legend><input type="text" id="tv" onchange="publ(this)" ></fieldset>-->
+        <fieldset><legend>FiO2 (%)</legend><input type="text" id="fio2" onchange="publ(this)" ></fieldset>
+        <fieldset><legend>patient triggered</legend><input type="checkbox" id="patrigmode" onchange="publ(this)" ></fieldset>
+        <!-- todo: alarm criteria -->
+        <!-- todo: input validation -->
+        <!-- todo: enum ctrls rather than continuous vars? e.g. FiO2 in (20,40,60,80,100) -->
+      </div>
+      
+      <div id="center-panel">
+        <div class="myplot" id="pressure-plot"></div>
+        <div class="myplot" id="flow-plot"></div>
+        <div class="myplot" id="volume-plot"></div>
+        <div class="myplot" id="fio2-plot"></div>
+        <div class="myplot" id="rh-plot"></div>
+        <div class="myplot" id="temp-plot"></div>
+      </div>
+
+      <div id="right-panel">
+        <fieldset>
+          <legend>breath #</legend>
+          <div id="nbreaths">---</div>
+        </fieldset>
+        <fieldset>
+          <legend>bpm</legend>
+          <div id="bpm_out">---</div>
+        </fieldset>
+        <fieldset>
+          <legend>minute ventilation (ml/min)</legend>
+          <div id="minvent">---</div>
+        </fieldset>
+        <fieldset>
+          <legend>FiO2 (%)</legend>
+          <div id="fio2">---</div>
+        </fieldset>
+        <fieldset>
+          <legend>RH (%)</legend>
+          <div id="rh">---</div>
+        </fieldset>
+      </div>
+
+    </div>
+    
     <script>
 
-      var mqttHost = "localhost";
+      var mqttHost = "manawa-ora-1";
       var client = new Paho.MQTT.Client(mqttHost, Number("9001"), "client-" + parseInt(10000*Math.random(),10));
 
       client.onMessageArrived = onMessageArrived;
@@ -36,31 +82,96 @@
           console.log("onConnect");
           client.subscribe("breathe/nbreaths");
           client.subscribe("breathe/sensors/#");
+          client.subscribe("breathe/bpm");
       }
+
+      //var time = [];
+      //var pressure = [];
+      //var volume = [];
       
       function onMessageArrived(message) {
-          console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
+          //console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
           if (message.destinationName == "breathe/nbreaths") {
               //var data = JSON.parse(message.payloadString);
               //$("#nbreaths").html(Math.round(data.value));
               $("#nbreaths").html(message.payloadString);
           }
-          if (message.destinationName == "breathe/sensors/p_h") {
+          if (message.destinationName == "breathe/bpm") {
+              $("#bpm_out").html(message.payloadString);
+          }
+          if (message.destinationName == "breathe/sensors/current") {
               var data = JSON.parse(message.payloadString);
+              var t = data.t.map(a => a- Math.max(...data.t));
+
+              //todo: say goodbye to cut'n'paste
+              // inspiration pressure
+              var y = data.p_h;
+              var y2 = data.p_l;
               var plot = [
                   {
-                      x: data.ts,
-                      y: data.values,
+                      x: t,
+                      y: y,
+                      type: 'scatter'
+                  },
+                  {
+                      x: t,
+                      y: y2,
                       type: 'scatter'
                   }
               ];
               var layout = {
                   yaxis: {
-                      title: "p_i",
+                      title: "pressure (cmH2O)",
                   }
+                  ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
               Plotly.newPlot('pressure-plot', plot, layout);
+
+              // inspiration temp
+              var y = data.t_h;
+              var plot = [
+                  {
+                      x: t,
+                      y: y,
+                      type: 'scatter'
+                  }
+              ];
+              var layout = {
+                  yaxis: {
+                      title: "temp (degC)",
+                  }
+                  ,margin: {l: 80, r:20, b:20, t:0, pad:0}
+              };
+              Plotly.newPlot('temp-plot', plot, layout);
+
+
+              // humidity
+              var y = data.h_h;
+              var plot = [
+                  {
+                      x: t,
+                      y: y,
+                      type: 'scatter'
+                  }
+              ];
+              var layout = {
+                  yaxis: {
+                      title: "RH (%)",
+                  }
+                  ,margin: {l: 80, r:20, b:20, t:0, pad:0}
+              };
+              Plotly.newPlot('rh-plot', plot, layout);
+
           }
+      }
+
+      function publ(inp) {
+          console.log(inp);
+          msg = new Paho.MQTT.Message(inp.value);
+          msg.destinationName = "breathe/inputs/"+inp.id;
+          msg.retained = true;
+          console.log(msg);
+          client.send(msg);
       }
       
     </script>

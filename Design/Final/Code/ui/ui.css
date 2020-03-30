@@ -34,18 +34,11 @@ body {
     flex-grow: 1;
 }
 
-
-#nbreaths {
-    font-size: 16pt;
-    width: 3ex;
+.output {
+    font-size: 64pt;
+    width: 4ex;
+>>>>>>> Stashed changes
     height: 1em;
-}
-
-#bpm_out {
-    font-size: 16pt;
-    width: 3ex;
-    height: 1em;
-}
 
 fieldset {
     background-color: white;
