@@ -106,10 +106,16 @@
               //todo: say goodbye to cut'n'paste
               // inspiration pressure
               var y = data.p_h;
+              var y2 = data.p_l;
               var plot = [
                   {
                       x: t,
                       y: y,
+                      type: 'scatter'
+                  },
+                  {
+                      x: t,
+                      y: y2,
                       type: 'scatter'
                   }
               ];
