@@ -68,6 +68,7 @@ flow_eps = 0. # the largest flow rate that should be considered "no flow"
 def update_input(i):
     pth = 'breathe/inputs/'+i
     if pth in M.messages and M.messages[pth] is not None:
+        print(i, pth, M.messages[pth])
         return M.messages[pth]
     else:
         return subscribe_to_topics[pth][0]
@@ -82,10 +83,10 @@ while True: # main control loop
     if M.messages['breathe/runstate'] == 'pause': continue
     
     # update control params based on current settings
-    bpm = update_input('bpm')
+    bpm = float(update_input('bpm'))
     #p_i = update_input('inp')
     #p_e = update_input('peep')
-    ieratio = update_input('ieratio')
+    ieratio = float(update_input('ieratio'))
     patrigmode = update_input('patrigmode')
 
     # deal with accumulated sensor data
