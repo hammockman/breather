@@ -11,33 +11,33 @@ Good FAQ with links [here](https://www.agorize.com/en/challenges/code-life-chall
 Deliverables:
 
 
- - CAD drawings ()Please provide 2 options)
+ - CAD drawings ()Please provide 2 options) - Ra
 
    - Fully annotated 2D drawings (.pdf)
 
    - 3D mesh files (.stl)
 
- - Fully annotated circuit diagrams
+ - Fully annotated circuit diagrams - Miriam
 
- - Functional block diagram
+ - Functional block diagram, and pneumatic circuit - Jo
 
- - Code: software/firmware. Include brief installation and user guide (.pdf)
+ - Code: software/firmware. Include brief installation and user guide - Ra
 
- - Bill of materials (.pdf)
+ - Bill of materials - Jo
 
- - Clear and concise assembly instructions (.pdf)
+ - Clear and concise assembly instructions - Jo and Ra
 
- - Clear user guide (.pdf)
+ - Clear user guide - Jono
 
- - How to run a validation test and how often (.pdf)
+ - How to run a validation test and how often - Jono
 
- - How to maintain the device and clean the device, VIDEO demonstration of device (.mp4)
+ - How to maintain the device and clean the device - Jono VIDEO demonstration of device - Kylie, Jo, Ra
 
- - Test methods and test results (.pdf)
+ - Test methods and test results - Jo
 
  - Endorsement
 
-   - Medical Endorsement, ICU professional (ICU Physician or respiratory technician) (.pdf)
+   - Medical Endorsement, ICU professional (ICU Physician or respiratory technician) - Lance/Vicki/God
 
    - Technical Endorsement, Engineering professional attesting that safety
-     (electrical, fire, etc.) have been met (.pdf)
+     (electrical, fire, etc.) have been met - Miriam
