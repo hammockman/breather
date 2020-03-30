@@ -37,6 +37,12 @@ body {
     height: 1em;
 }
 
+#bpm_out {
+    font-size: 16pt;
+    width: 3ex;
+    height: 1em;
+}
+
 fieldset {
     display: inline-block;
 }

@@ -44,7 +44,7 @@
         </fieldset>
         <fieldset>
           <legend>bpm</legend>
-          <div id="bpm">---</div>
+          <div id="bpm_out">---</div>
         </fieldset>
         <fieldset>
           <legend>minute ventilation (ml/min)</legend>
@@ -82,6 +82,7 @@
           console.log("onConnect");
           client.subscribe("breathe/nbreaths");
           client.subscribe("breathe/sensors/#");
+          client.subscribe("breathe/bpm");
       }
 
       //var time = [];
@@ -89,14 +90,14 @@
       //var volume = [];
       
       function onMessageArrived(message) {
-          console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
+          //console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
           if (message.destinationName == "breathe/nbreaths") {
               //var data = JSON.parse(message.payloadString);
               //$("#nbreaths").html(Math.round(data.value));
               $("#nbreaths").html(message.payloadString);
           }
           if (message.destinationName == "breathe/bpm") {
-              $("#bpm").html(message.payloadString);
+              $("#bpm_out").html(message.payloadString);
           }
           if (message.destinationName == "breathe/sensors/current") {
               var data = JSON.parse(message.payloadString);
