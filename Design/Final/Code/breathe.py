@@ -90,6 +90,7 @@ while True: # main control loop
     sensor_current_values = deque2dict(S.current_values)
     M.publish('breathe/sensors/current', json.dumps(sensor_current_values), retain=True)
     M.publish('breathe/nbreaths', nbreaths, retain=True)
+    M.publish('breathe/bpm', nbreaths, retain=True)
     
     # exit if instructed to
     if M.messages['breathe/runstate'] == 'quit':
