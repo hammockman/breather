@@ -31,7 +31,7 @@ from datetime import timedelta
 import collections
 import time
 
-import Adafruit_DHT
+import Adafruit_DHT # deprecated, use CircuitPython instead: https://github.com/adafruit/Adafruit_Python_DHT
 
 
 # at the moment I'm hoping to simply grab everything once per control loop
