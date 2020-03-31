@@ -41,7 +41,10 @@ from pidf import PIDF
 from lpf import LPF
 from rate_limiter import RateLimiter
 
-from smbus import SMBus
+try:
+    from smbus import SMBus
+except:
+    from fakesmbus import SMBus
 bus = SMBus(1)
 
 # at the moment I'm hoping to simply grab everything once per control loop
@@ -82,7 +85,7 @@ def read_all():
 
 
 class SensorsThread(threading.Thread):
-    def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11):
+    def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11, **kwargs):
         threading.Thread.__init__(self)
         self.p_set_point = 0
         self.rl_p_set_point = RateLimiter(-20, 20, 1/30)
@@ -102,6 +105,8 @@ class SensorsThread(threading.Thread):
         self.daemon = daemon # if set auto-terminate when main thread exits
         self.valves = [LED(17), LED(18), LED(22)]
         self.ie = None # for tracking inspiration/expiration
+        for k,v in kwargs:
+            setattr(self, k, v) # e.g. installed_flow_meters
         self.start()
         
 
@@ -120,13 +125,28 @@ class SensorsThread(threading.Thread):
     def run(self):
         while not self.stopped.wait(self.delay.total_seconds()):
             current_val = read_all()
-            current_val['ie'] = self.ie
-            if len(self.current_values)>1 and self.ie>0: # inspiration
+            current_val['ie'] = self.ie # not needed, but maybe helpful for debugging
+
+            # integrate tidal volume
+            if len(self.current_values)>1: # catch the case when no data yet acquired
                 dt = current_val['t'] - self.current_values[-1]['t']
                 dtv = (current_val['q_h'] + self.current_values[-1]['q_h'])/2 * dt
-                current_val['tv_h'] = self.current_values[-1]['tv_h'] + dtv
+                if self.installed_flow_meters=='I':
+                    if self.ie>0: # inspiration
+                        current_val['tv_h'] = self.current_values[-1]['tv_h'] + dtv
+                    else:
+                        current_val['tv_h'] = 0 # FIXME: patient exhales instantaneously!!!
+                elif self.installed_flow_meters=='E':
+                    if self.ie>0: # inspiration
+                        # start simple with just -ve 
+                        current_val['tv_h'] = 0 # FIXME: patient INHALES instantaneously!!!
+                    else:
+                        current_val['tv_h'] = self.current_values[-1]['tv_h'] - dtv
+                else:
+                    raise ValueError('Unknown value for installed_flow_meters=%s % self.installed_flow_meters')
             else:
-                current_val['tv_h'] = 0 # FIXME: the patient exhales instantly!!!
+                current_val['tv_h'] = 0 # default value
+            
             self.current_values.append(current_val)
             self.samples_recv += 1
 

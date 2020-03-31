@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Ventillator contol program
 
@@ -33,6 +34,13 @@ import json
 import logging
 
 
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument("--flow-meters", dest="installed_flow_meters", default="E", help="specify which lines are equipped with flow meters (I, E)")
+run_opts = parser.parse_args()
+print(run_opts)
+
 def deque2dict(q):
     """
     render a collections.deque list-of-dicts as a dict-of-lists
@@ -60,11 +68,12 @@ subscribe_to_topics = {
     'breathe/inputs/patrigmode': (1, None), # can the patient trigger inspiration?
 }
 
+
 M = MessagingThread(subscribe_to_topics)
 print(M.messages)
 fs = 15 # JH had 30
 maxnvalues = int(180*fs/5) # 5 bpm is as low as it'll ever go???
-S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02)
+S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02, installed_flow_meters=opts.installed_flow_meters)
 #SlowS = SlowSensorsThread(fs=0.2, maxnvalues=10, read_all_duration=.5)
 # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
 
