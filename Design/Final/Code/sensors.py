@@ -141,7 +141,7 @@ class SensorsThread(threading.Thread):
             #print(' '*2*int(self.current_values[-1]['p_h']) + 'p')
             #print(' '*int(u) + 'u')
             # Hacking completely:
-            if self.inspiration:
+            if self.ie>0:
                 self.send_to_valve(self.i_valve_id, u)
                 self.valves[self.e_valve_id].off()
             else:
