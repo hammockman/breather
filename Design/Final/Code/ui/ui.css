@@ -58,9 +58,11 @@ fieldset {
     border-radius: 10px;
 }
 
+/*
 #fio2-plot, #flow-plot {
     display: none;
 }
+*/
 
 .panel {
     margin: 1em 2em;

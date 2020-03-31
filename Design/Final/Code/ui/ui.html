@@ -36,7 +36,7 @@
         <div class="myplot" id="pressure-plot"></div>
         <div class="myplot" id="flow-plot"></div>
         <div class="myplot" id="volume-plot"></div>
-        <div class="myplot" id="fio2-plot"></div>
+        <!--<div class="myplot" id="fio2-plot"></div>-->
         <!--<div class="myplot" id="rh-plot"></div>-->
         <!--<div class="myplot" id="temp-plot"></div>-->
       </div>
@@ -108,7 +108,7 @@
       //var volume = [];
       
       function onMessageArrived(message) {
-          //console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
+          console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
           if (message.destinationName == "breathe/nbreaths") {
               //var data = JSON.parse(message.payloadString);
               //$("#nbreaths").html(Math.round(data.value));
@@ -215,7 +215,10 @@
           }
           */
           if (message.destinationName == "breathe/lastbreathdt") {
-              $('#bpm_out').html(60/parseFloat(message.payload));
+              $('#bpm_out').html( (60./parseFloat(message.payloadString)).toFixed(1) );
+          }
+          if (message.destinationName == "breathe/minvent") {
+              $('#minvent').html(parseFloat(message.payloaStringd).toFixed(1));
           }
       }
 
