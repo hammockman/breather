@@ -101,6 +101,7 @@
           client.subscribe("breathe/slow_sensors/#");
           client.subscribe("breathe/bpm");
           client.subscribe("breathe/lastbreathdt");
+          client.subscribe("breathe/minvent");
       }
 
       //var time = [];
@@ -218,7 +219,7 @@
               $('#bpm_out').html( (60./parseFloat(message.payloadString)).toFixed(1) );
           }
           if (message.destinationName == "breathe/minvent") {
-              $('#minvent').html(parseFloat(message.payloaStringd).toFixed(1));
+              $('#minvent').html(parseFloat(message.payloadString).toFixed(1));
           }
       }
 
