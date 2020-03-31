@@ -103,14 +103,14 @@ while True: # main control loop
     # Add tidal volume. We do it here (at the mo) cause we need to
     # know t0 and cause time is short.
     if inspiration:
-        print(last_tv)
-        sensor_current_values['tv_h'] = list(
-            last_tv + np.cumsum(
+        tmp = np.cumsum(
                 np.array(sensor_current_values['q_h'])
-                *np.hstack((0, np.diff((np.array(sensor_current_values['t']) - t0))))
-            )
-        )
+                *np.hstack((0, np.diff(np.array(sensor_current_values['t'])))))
+        print(len(sensor_current_values), last_tv, tmp[0], tmp[-1])
+        sensor_current_values['tv_h'] = list(last_tv + tmp)
+
         last_tv = sensor_current_values['tv_h'][-1]
+        #print(last_tv, sensor_current_values['tv_h'][0], sensor_current_values['tv_h'][-1])
     else:
         sensor_current_values['tv_h'] = list(0*np.array(sensor_current_values['t']))
     M.publish('breathe/sensors/current', json.dumps(sensor_current_values), retain=True)
