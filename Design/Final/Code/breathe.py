@@ -73,7 +73,7 @@ M = MessagingThread(subscribe_to_topics)
 print(M.messages)
 fs = 15 # JH had 30
 maxnvalues = int(180*fs/5) # 5 bpm is as low as it'll ever go???
-S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02, installed_flow_meters=opts.installed_flow_meters)
+S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02, installed_flow_meters=run_opts.installed_flow_meters)
 #SlowS = SlowSensorsThread(fs=0.2, maxnvalues=10, read_all_duration=.5)
 # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
 

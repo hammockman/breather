@@ -105,7 +105,7 @@ class SensorsThread(threading.Thread):
         self.daemon = daemon # if set auto-terminate when main thread exits
         self.valves = [LED(17), LED(18), LED(22)]
         self.ie = None # for tracking inspiration/expiration
-        for k,v in kwargs:
+        for k,v in kwargs.items():
             setattr(self, k, v) # e.g. installed_flow_meters
         self.start()
         
