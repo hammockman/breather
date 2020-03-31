@@ -122,7 +122,9 @@ class SensorsThread(threading.Thread):
             current_val = read_all()
             current_val['ie'] = self.ie
             if self.ie>0: # inspiration
-                current_val['tv_h'] = self.current_values[-1][tv_h]
+                dt = current_val['t'] - self.current_values[-1]['t']
+                dtv = (current_val['q_h'] + self.current_values[-1]['q_h'])/2 * dt
+                current_val['tv_h'] = self.current_values[-1]['tv_h'] + dtv
             else:
                 current_val['tv_h'] = 0 # FIXME: the patient exhales instantly!!!
             self.current_values.append(current_val)
