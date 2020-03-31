@@ -16,15 +16,16 @@ Units er units/seconds.
     self.limits[0] = lowerLimit;
     self.limits[1] = upperLimit;
     self.dt = dt;
-    self.y = self.yPrev = 0.;
+    self.y = 0;
 
 
   def update(self, yRaw):
     if ((yRaw - self.y) / self.dt > self.limits[1]):
-      y = self.y + self.limits[1] * self.dt;
+      self.y = self.y + self.limits[1] * self.dt;
     elif ((yRaw - self.y) / self.dt < self.limits[0]):
       self.y = self.y + self.limits[0] * self.dt
     else:
       self.y = yRaw
-      
+
+    print(yRaw, self.y, (yRaw - self.y) / self.dt)
     return self.y;

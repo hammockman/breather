@@ -120,6 +120,9 @@ x2 = int(-7357 * p) >> 16 ; print("x2 = ",x2)
 p = p + (int(x1 + x2 + 3791) >> 4) ; print("pressure = ",p,"Pa")
 
 
-pSensor = BMP085(address=0x77)
-p_h, t_h = pSensor.read()
-print("From sensors.py: %f Pa, %f degC " % (p_h, t_h))
+pSensor_h = BMP085(bus=1, address=0x77)
+p_h, t_h = pSensor_h.read()
+print("From sensors.py: %f cm H2O, %f degC " % (p_h, t_h))
+pSensor_l = BMP085(bus=4, address=0x77)
+p_l, t_l = pSensor_l.read()
+print("From sensors.py: %f cm H2O, %f degC " % (p_l, t_l))

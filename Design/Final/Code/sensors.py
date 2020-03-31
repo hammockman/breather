@@ -41,11 +41,21 @@ from pidf import PIDF
 from lpf import LPF
 from rate_limiter import RateLimiter
 
+from smbus import SMBus
+bus = SMBus(1)
+
 # at the moment I'm hoping to simply grab everything once per control loop
 # if it turns out sensors are slow/variable to read then this plan will change
 __all__ = ["read_all", "Sensors"] 
 
-bmp085 = BMP085(address=0x77)
+bmp085_h = BMP085(bus=1, address=0x77)
+bmp085_l = BMP085(bus=4, address=0x77)
+
+# this device should be address 0x48
+def read_ai0():
+  bus.write_byte(0x48, 0 & 0x03) # select the channel
+  bus.write_byte(0x48, 0) # give it time to convert
+  return bus.read_byte(0x48)
 
 def read_all():
 
@@ -54,31 +64,35 @@ def read_all():
     #from random import random
 
 
-    p_h, t_h = bmp085.read()
+    p_h, t_h = bmp085_h.read()
+    p_l, t_l = bmp085_l.read()
+    q_h = read_ai0() - 31 # 31 seems to be zero flow.
     
     return {
         't': time.time(),
-        'q_h':None,
-        'q_l':None,
-        'p_h':p_h, 
-        'p_l':None,
-        't_h':t_h,
-        't_l':None,
-        'h_h':None,
-        'h_l':None,
-        'o_h':None,
-        'o_l':None,
+        'q_h': q_h,
+        'q_l': None,
+        'p_h': p_h, 
+        'p_l': p_l,
+        't_h': t_h,
+        't_l': t_l,
+        'o_h': None,
+        'o_l': None,
     }
 
 
 class SensorsThread(threading.Thread):
     def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11):
         threading.Thread.__init__(self)
+        self.inspiration = False
         self.p_set_point = 0
-        self.rl_p_set_point = RateLimiter(5, 10, 1/50)
-        self.pidf = PIDF(0.5, 0, 0, 0.05)
+        self.rl_p_set_point = RateLimiter(-20, 20, 1/30)
+        #self.pidf = PIDF(0.4, 0, 0, 0.05)
+        self.pidf = PIDF(0.1, 0, 0, 0.03)
         # 2 Hz.
         self.lpf_p = LPF([0.00355661, 0.00711322, 0.00355661], [ 1., -1.78994555,0.80417199])
+        # 5 Hz at fs=15
+        #[0.05628602, 0.16885807, 0.16885807, 0.05628602]
         self.i_valve_id = 0
         self.e_valve_id = 2
         self.stopped = threading.Event()
@@ -106,21 +120,24 @@ class SensorsThread(threading.Thread):
         while not self.stopped.wait(self.delay.total_seconds()):
             self.current_values.append(read_all())
             self.samples_recv += 1
+
             #p_set_point_rl = self.rl_p_set_point.update(self.p_set_point)
             p_set_point_rl = self.p_set_point
+            #print(p_set_point_rl)
             #p_h = self.lpf_p.update(self.current_values[-1]['p_h'])
             p_h = self.current_values[-1]['p_h']
             u = self.pidf.calc_output(p_h, p_set_point_rl)
             #print('%2.0f\t%2.0f\t%2.0f' % (self.p_set_point, self.current_values[-1]['p_h'] - 988, u))
-            #print(' '*2*int(self.p_set_point) + 's')
+            #print(' '*2*int(p_set_point_rl) + 's')
             #print(' '*2*int(self.current_values[-1]['p_h']) + 'p')
             #print(' '*int(u) + 'u')
-            self.send_to_valve(self.i_valve_id, u)
             # Hacking completely:
-            if self.p_set_point < 10:
-                self.valves[self.e_valve_id].on()
-            else:
+            if self.inspiration:
+                self.send_to_valve(self.i_valve_id, u)
                 self.valves[self.e_valve_id].off()
+            else:
+                self.send_to_valve(self.i_valve_id, 0)
+                self.valves[self.e_valve_id].on()
             #if self.samples_recv%(selfs.current_values.maxlen//2)==0:
             #    import pandas as pd
             #    print(pd.DataFrame(self.current_values)['t'].diff())
@@ -128,5 +145,5 @@ class SensorsThread(threading.Thread):
             
 if __name__=="__main__":
     #T = SensorsThread(fs=10, daemon=False)
-    print(read_bmp085(0x77))
+    print(read_bmp085_h(0x77))
         

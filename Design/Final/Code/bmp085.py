@@ -7,9 +7,9 @@ from utils import get_word, twos_compliment
 
 class BMP085():
 
-    def __init__(self, address):
+    def __init__(self, bus, address):
         self.address = address
-        self.bus = smbus.SMBus(1) # or bus = smbus.SMBus(1) if you have a revision 2 board 
+        self.bus = smbus.SMBus(bus)
 
         self.p_amb = 987 # hPa or cm H20. Neee to get this from another sensor!
         
@@ -56,11 +56,11 @@ class BMP085():
         # like a minimum. Can't make this sequential?
         # Read raw temperature
         self.write_byte(0xF4, 0x2E)
-        time.sleep(0.003)
+        time.sleep(0.004)
         temp_raw = self.read_word_2c(0xF6)
 
         self.write_byte(0xF4, 0x34 + (self.oss << 6))
-        time.sleep(0.003)
+        time.sleep(0.004)
         pressure_raw = ((self.read_byte(0xF6) << 16) + (self.read_byte(0xF7) << 8) + (self.read_byte(0xF8)) ) >> (8-self.oss)
 
 

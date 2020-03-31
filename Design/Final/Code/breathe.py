@@ -26,7 +26,9 @@ jh, Mar 2020
 
 from messaging import MessagingThread
 from sensors import SensorsThread
+from slow_sensors import SlowSensorsThread
 from time import time, sleep
+import numpy as np
 import json
 import logging
 
@@ -35,6 +37,7 @@ def deque2dict(q):
     """
     render a collections.deque list-of-dicts as a dict-of-lists
     """
+    
     if len(q)==0: return {}
     out = {k:[] for k in q[0].keys()}
     for k in out.keys():
@@ -50,8 +53,8 @@ subscribe_to_topics = {
     #'breathe/runmode': ('AC', None), # AC=CMV, PC, ...
     #'breathe/inputs/fio2': (0.5, None), # fraction inspired oxygen 
     #'breathe/inputs/tv': (550, None), # ml; tidal volume
-    'breathe/inputs/bpm': (8, None), # min^-1; backup breathing rate
-    'breathe/inputs/inp': (20, None), # cmH20; inspiration pressure
+    'breathe/inputs/bpm': (20, None), # min^-1; backup breathing rate
+    'breathe/inputs/inp': (6, None), # cmH20; inspiration pressure
     'breathe/inputs/peep': (2, None), # cmH20; positive end expiratory pressure
     'breathe/inputs/ieratio': (1, None), # ins:exp-iration ratio
     'breathe/inputs/patrigmode': (1, None), # can the patient trigger inspiration?
@@ -59,9 +62,10 @@ subscribe_to_topics = {
 
 M = MessagingThread(subscribe_to_topics)
 print(M.messages)
-fs = 30 # JH had 30
+fs = 15 # JH had 30
 maxnvalues = int(180*fs/5) # 5 bpm is as low as it'll ever go???
 S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02)
+#SlowS = SlowSensorsThread(fs=0.2, maxnvalues=10, read_all_duration=.5)
 # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
 
 
@@ -78,8 +82,10 @@ def update_input(i):
 
 
 nbreaths = 0
+last_tv = 0
 t0 = time() # t0 tracks the start of inspiration
 inspiration = True
+S.inspiration = inspiration
 S.p_set_point = float(update_input('inp'))
 M.publish('breathe/runstate','run'); sleep(2)
 while True: # main control loop
@@ -94,7 +100,24 @@ while True: # main control loop
 
     # deal with accumulated sensor data
     sensor_current_values = deque2dict(S.current_values)
+    # Add tidal volume. We do it here (at the mo) cause we need to
+    # know t0 and cause time is short.
+    if inspiration:
+        print(last_tv)
+        sensor_current_values['tv_h'] = list(
+            last_tv + np.cumsum(
+                np.array(sensor_current_values['q_h'])
+                *np.hstack((0, np.diff((np.array(sensor_current_values['t']) - t0))))
+            )
+        )
+        last_tv = sensor_current_values['tv_h'][-1]
+    else:
+        sensor_current_values['tv_h'] = list(0*np.array(sensor_current_values['t']))
     M.publish('breathe/sensors/current', json.dumps(sensor_current_values), retain=True)
+    
+    #slow_sensor_current_values = deque2dict(SlowS.current_values)
+    #M.publish('breathe/slow_sensors/current', json.dumps(slow_sensor_current_values), retain=True)
+
     M.publish('breathe/nbreaths', nbreaths, retain=True)
     M.publish('breathe/bpm', bpm, retain=True) # eventually this will become the TRUE instantaneous breath rate c.f. backup bpm
 
@@ -103,7 +126,6 @@ while True: # main control loop
         logging.warning('Requested bpm=%s > 20. Using bpm=20 instead', bpm)
         bpm = 20
 
-    
     # exit if instructed to
     if M.messages['breathe/runstate'] == 'quit':
         # todo: write current state for restore on restart
@@ -116,6 +138,7 @@ while True: # main control loop
         if flow<flow_eps or t>t0 + 60/bpm/(1. + ieratio):
             # force change over from ins- to ex-piration
             inspiration = False
+            S.inspiration = inspiration
             S.p_set_point = float(update_input('peep'))
     else: # we're in expiration phase
         # trigger a new breath?
@@ -123,7 +146,9 @@ while True: # main control loop
         if (patrigmode and exp_pressure<0) or t>60/bpm:
             nbreaths += 1
             t0 = t
+            last_tv = 0
             inspiration = True
+            S.inspiration = inspiration
             S.p_set_point = float(update_input('inp'))
             continue
 
