@@ -121,7 +121,7 @@ class SensorsThread(threading.Thread):
         while not self.stopped.wait(self.delay.total_seconds()):
             current_val = read_all()
             current_val['ie'] = self.ie
-            if self.ie>0: # inspiration
+            if len(self.current_values)>1 and self.ie>0: # inspiration
                 dt = current_val['t'] - self.current_values[-1]['t']
                 dtv = (current_val['q_h'] + self.current_values[-1]['q_h'])/2 * dt
                 current_val['tv_h'] = self.current_values[-1]['tv_h'] + dtv
