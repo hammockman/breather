@@ -58,7 +58,7 @@ fieldset {
     border-radius: 10px;
 }
 
-#volume-plot, #fio2-plot, #flow-plot {
+#fio2-plot, #flow-plot {
     display: none;
 }
 

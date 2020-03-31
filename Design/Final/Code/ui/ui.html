@@ -20,7 +20,7 @@
 	<h1>Manawa Ora</h1>
 	<h3>Breathe (ver. 0.3)</h3>
         <fieldset><legend>Breath rate (b.p.m.)</legend><input type="number" min="5" max="20" step="0.1" id="bpm" onchange="publ(this)" value="12"></fieldset>
-        <fieldset><legend>Inspiration pressure (cm H2O)</legend><input type="number" min="10" max="40" step="0.5" id="inp" onchange="publ(this)" value="20"></fieldset>
+        <fieldset><legend>Inspiration pressure (cm H2O)</legend><input type="number" min="10" max="40" step="0.5" id="inp" onchange="publ(this)" value="8"></fieldset>
         <fieldset><legend>Expiratory pressure (PEEP) (cmH2O)</legend><input type="number" min="1" max="10" step="0.2" id="peep" onchange="publ(this)" value="5"></fieldset>
         <fieldset><legend>I:E ratio</legend><input type="number" min="0.2" max="2" step="0.1" id="ieratio" onchange="publ(this)" value="1.2"></fieldset>
         <!--<fieldset><legend>tidal volume (ml)</legend><input type="text" id="tv" onchange="publ(this)" ></fieldset>-->
@@ -140,8 +140,9 @@
               };
               Plotly.newPlot('pressure-plot', plot, layout);
 
-              // inspiration temp
-              var y = data.t_h;
+              // volume plot
+              var y = data.tv_h;
+	      console.log(y)
               var plot = [
                   {
                       x: t,
@@ -151,7 +152,25 @@
               ];
               var layout = {
                   yaxis: {
-                      title: "Temperature (degC)",
+                      title: "Inspired TV (mL)",
+                  }
+                  ,margin: {l: 80, r:20, b:20, t:0, pad:0}
+              };
+              Plotly.newPlot('volume-plot', plot, layout);
+	      
+              // inspiration temp
+              var y = data.q_h;
+              var plot = [
+                  {
+                      x: t,
+                      y: y,
+                      type: 'scatter'
+                  }
+              ];
+              var layout = {
+                  yaxis: {
+                      //title: "Temperature (degC)",
+                      title: "Flow (?)",
                   }
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
@@ -163,15 +182,15 @@
 	  if (message.destinationName == "breathe/slow_sensors/current") {
 
 	      // Why isn't data stacking up?
-              var sdata = JSON.parse(message.payloadString);
-              var st = sdata.t.map(a => a- Math.max(...sdata.t));
+              var data = JSON.parse(message.payloadString);
+              var t = data.t.map(a => a- Math.max(...data.t));
 
               //todo: say goodbye to cut'n'paste
               // humidity
-              var y = sdata.h_h;
+              var y = data.h_h;
               var plot = [
                   {
-                      x: st,
+                      x: t,
                       y: y,
                       type: 'scatter'
                   }
@@ -188,7 +207,7 @@
       }
 
       function publ(inp) {
-          console.log(inp);
+          //console.log(inp);
           msg = new Paho.MQTT.Message(inp.value);
           msg.destinationName = "breathe/inputs/"+inp.id;
           msg.retained = true;
@@ -197,7 +216,7 @@
       }
 
       function toggle_runstate() {
-          console.log($("#runstate").val());
+          //console.log($("#runstate").val());
           msg = new Paho.MQTT.Message($("#runstate").val());
           msg.destinationName = 'breathe/runstate';
           msg.retained = true;
