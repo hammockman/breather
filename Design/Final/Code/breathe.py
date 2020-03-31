@@ -69,7 +69,7 @@ S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02)
 # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
 
 
-flow_eps = 0. # the largest flow rate that should be considered "no flow"
+flow_eps = 5. # the largest flow rate that should be considered "no flow"
 
 def update_input(i):
     pth = 'breathe/inputs/'+i
@@ -82,10 +82,9 @@ def update_input(i):
 
 
 nbreaths = 0
-last_tv = 0
 t0 = time() # t0 tracks the start of inspiration
 inspiration = True
-S.inspiration = inspiration
+S.ie = 1
 S.p_set_point = float(update_input('inp'))
 M.publish('breathe/runstate','run'); sleep(2)
 while True: # main control loop
@@ -100,19 +99,6 @@ while True: # main control loop
 
     # deal with accumulated sensor data
     sensor_current_values = deque2dict(S.current_values)
-    # Add tidal volume. We do it here (at the mo) cause we need to
-    # know t0 and cause time is short.
-    if inspiration:
-        print(last_tv)
-        sensor_current_values['tv_h'] = list(
-            last_tv + np.cumsum(
-                np.array(sensor_current_values['q_h'])
-                *np.hstack((0, np.diff((np.array(sensor_current_values['t']) - t0))))
-            )
-        )
-        last_tv = sensor_current_values['tv_h'][-1]
-    else:
-        sensor_current_values['tv_h'] = list(0*np.array(sensor_current_values['t']))
     M.publish('breathe/sensors/current', json.dumps(sensor_current_values), retain=True)
     
     #slow_sensor_current_values = deque2dict(SlowS.current_values)
@@ -134,11 +120,11 @@ while True: # main control loop
     # todo: get current flow rate
     t = time()
     if inspiration:
-        flow = 100. # sensor_current_values['q_h']
+        flow = 100 #sensor_current_values['q_h'][-1]
         if flow<flow_eps or t>t0 + 60/bpm/(1. + ieratio):
             # force change over from ins- to ex-piration
             inspiration = False
-            S.inspiration = inspiration
+            S.ie = -1
             S.p_set_point = float(update_input('peep'))
     else: # we're in expiration phase
         # trigger a new breath?
@@ -146,9 +132,8 @@ while True: # main control loop
         if (patrigmode and exp_pressure<0) or t>60/bpm:
             nbreaths += 1
             t0 = t
-            last_tv = 0
             inspiration = True
-            S.inspiration = inspiration
+            S.ie = 1
             S.p_set_point = float(update_input('inp'))
             continue
 

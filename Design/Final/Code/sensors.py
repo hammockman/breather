@@ -84,7 +84,6 @@ def read_all():
 class SensorsThread(threading.Thread):
     def __init__(self, fs=10, daemon=True, maxnvalues=100, read_all_duration=0.11):
         threading.Thread.__init__(self)
-        self.inspiration = False
         self.p_set_point = 0
         self.rl_p_set_point = RateLimiter(-20, 20, 1/30)
         #self.pidf = PIDF(0.4, 0, 0, 0.05)
@@ -102,7 +101,9 @@ class SensorsThread(threading.Thread):
         self.current_values = collections.deque(maxlen=maxnvalues)
         self.daemon = daemon # if set auto-terminate when main thread exits
         self.valves = [LED(17), LED(18), LED(22)]
+        self.ie = None # for tracking inspiration/expiration
         self.start()
+        
 
     def stop(self):
         self.stopped.set()
@@ -118,7 +119,13 @@ class SensorsThread(threading.Thread):
         
     def run(self):
         while not self.stopped.wait(self.delay.total_seconds()):
-            self.current_values.append(read_all())
+            current_val = read_all()
+            current_val['ie'] = self.ie
+            if self.ie>0: # inspiration
+                current_val['tv_h'] = self.current_values[-1][tv_h]
+            else:
+                current_val['tv_h'] = 0 # FIXME: the patient exhales instantly!!!
+            self.current_values.append(current_val)
             self.samples_recv += 1
 
             #p_set_point_rl = self.rl_p_set_point.update(self.p_set_point)
