@@ -87,6 +87,7 @@ inspiration = True
 S.ie = 1
 S.p_set_point = float(update_input('inp'))
 M.publish('breathe/runstate','run'); sleep(2)
+this_breath_inspired_tv = None
 while True: # main control loop
     if M.messages['breathe/runstate'] == 'pause': continue
     
@@ -126,11 +127,15 @@ while True: # main control loop
             inspiration = False
             S.ie = -1
             S.p_set_point = float(update_input('peep'))
+            this_breath_inspired_tv = sensor_current_values['tv_h'][-1]
     else: # we're in expiration phase
         # trigger a new breath?
         exp_pressure = sensor_current_values['p_h'][-1] # p_l doesn't exist
         if (patrigmode and exp_pressure<0) or t>60/bpm:
             nbreaths += 1
+            dt = t - t0
+            M.publish('breathe/lastbreathdt', dt, retain=True)
+            if this_breath_inspired_tv is not None: M.publish('breathe/minvent', this_breath_inspired_tv/dt, retain=True)
             t0 = t
             inspiration = True
             S.ie = 1

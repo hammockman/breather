@@ -37,8 +37,8 @@
         <div class="myplot" id="flow-plot"></div>
         <div class="myplot" id="volume-plot"></div>
         <div class="myplot" id="fio2-plot"></div>
-        <div class="myplot" id="rh-plot"></div>
-        <div class="myplot" id="temp-plot"></div>
+        <!--<div class="myplot" id="rh-plot"></div>-->
+        <!--<div class="myplot" id="temp-plot"></div>-->
       </div>
 
       <div id="right-panel" class="panel">
@@ -54,13 +54,17 @@
           <legend>Minute ventilation (ml/min)</legend>
           <div id="minvent" class="output">---</div>
         </fieldset>
-        <fieldset>
+        <!--<fieldset>
           <legend>FiO2 (%)</legend>
           <div id="fio2_out" class="output">---</div>
-        </fieldset>
+        </fieldset>-->
         <fieldset>
           <legend>RH (%)</legend>
           <div id="rh_out" class="output">---</div>
+        </fieldset>
+        <fieldset>
+          <legend>Air Temp (degC)</legend>
+          <div id="temp_out" class="output">---</div>
         </fieldset>
         <fieldset>
           <legend>inspiration pressure (cmH2O)</legend>
@@ -96,6 +100,7 @@
           client.subscribe("breathe/sensors/#");
           client.subscribe("breathe/slow_sensors/#");
           client.subscribe("breathe/bpm");
+          client.subscribe("breathe/lastbreathdt");
       }
 
       //var time = [];
@@ -109,13 +114,13 @@
               //$("#nbreaths").html(Math.round(data.value));
               $("#nbreaths").html(message.payloadString);
           }
-          if (message.destinationName == "breathe/bpm") {
-              $("#bpm_out").html(message.payloadString);
-          }
           if (message.destinationName == "breathe/sensors/current") {
               var data = JSON.parse(message.payloadString);
               var t = data.t.map(a => a- Math.max(...data.t));
 
+              // air temp
+              $("#temp_out").html(data.t_h[data.t_h.length-1].toFixed(1))
+              
               //todo: say goodbye to cut'n'paste
               // inspiration pressure
               var y = data.p_h;
@@ -142,8 +147,6 @@
 
               // volume plot
               var y = data.tv_h;
-	      console.log(y)
-	      
               var plot = [
                   {
                       x: t,
@@ -158,8 +161,9 @@
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
               Plotly.newPlot('volume-plot', plot, layout);
-	      
-              // inspiration temp
+
+              
+              // inspiration flow rate
               var y = data.q_h;
               var plot = [
                   {
@@ -170,20 +174,18 @@
               ];
               var layout = {
                   yaxis: {
-                      //title: "Temperature (degC)",
                       title: "Flow (?)",
                   }
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
-              Plotly.newPlot('temp-plot', plot, layout);
-
-
+              Plotly.newPlot('flow-plot', plot, layout);
           }
-	  
 	  if (message.destinationName == "breathe/slow_sensors/current") {
 
 	      // Why isn't data stacking up?
               var data = JSON.parse(message.payloadString);
+              $("#rh_out").html(data.h_h[data.h_h.length-1].toFixed(1));
+              /*
               var t = data.t.map(a => a- Math.max(...data.t));
 
               //todo: say goodbye to cut'n'paste
@@ -203,7 +205,17 @@
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
               Plotly.newPlot('rh-plot', plot, layout);
+              */
 
+              
+          }
+          /*
+          if (message.destinationName == "breathe/bpm") {
+              $("#bpm_out").html(message.payloadString);
+          }
+          */
+          if (message.destinationName == "breathe/lastbreathdt") {
+              $('#bpm_out').html(60/parseFloat(message.payload));
           }
       }
 
