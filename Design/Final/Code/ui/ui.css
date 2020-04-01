@@ -35,7 +35,7 @@ body {
 }
 
 .output {
-    font-size: 200%;
+    font-size: 600%;
     width: 4ex;
     height: 1em;
 }
@@ -58,11 +58,17 @@ fieldset {
     border-radius: 10px;
 }
 
-/*
-#fio2-plot, #flow-plot {
+fio2-plot, #fio2-plot {
     display: none;
 }
-*/
+
+temp-plot, #temp-plot, #temp_out_fs {
+    display: none;
+}
+
+#nbreaths_fs {
+    display: none;
+}
 
 .panel {
     margin: 1em 2em;

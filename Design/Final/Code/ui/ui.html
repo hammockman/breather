@@ -42,27 +42,27 @@
       </div>
 
       <div id="right-panel" class="panel">
-        <fieldset>
+        <fieldset id="nbreaths_fs">
           <legend>Breaths</legend>
           <div id="nbreaths" class="output">---</div>
         </fieldset>
-        <fieldset>
+        <fieldset id="bpm_out_fs">
           <legend>Recorded breath rate (b.p.m.)</legend>
           <div id="bpm_out" class="output">---</div>
         </fieldset>
-        <fieldset>
+        <fieldset id="minvent_fs">
           <legend>Minute ventilation (ml/min)</legend>
           <div id="minvent" class="output">---</div>
         </fieldset>
-        <!--<fieldset>
+        <fieldset id="fio2_out_fs">
           <legend>FiO2 (%)</legend>
-          <div id="fio2_out" class="output">---</div>
-        </fieldset>-->
-        <fieldset>
+          <div id="fio2_out" class="output">21</div>
+        </fieldset>
+        <fieldset id="rh_out_fs">
           <legend>RH (%)</legend>
           <div id="rh_out" class="output">---</div>
         </fieldset>
-        <fieldset>
+        <fieldset id="temp_out_fs">
           <legend>Air Temp (degC)</legend>
           <div id="temp_out" class="output">---</div>
         </fieldset>
@@ -122,7 +122,7 @@
               var t = data.t.map(a => a- Math.max(...data.t));
 
               // air temp
-              $("#temp_out").html(data.t_h[data.t_h.length-1].toFixed(1))
+              //$("#temp_out").html(data.t_h[data.t_h.length-1].toFixed(0))
               
               //todo: say goodbye to cut'n'paste
               // inspiration pressure
@@ -189,7 +189,7 @@
 
 	      // Why isn't data stacking up?
               var data = JSON.parse(message.payloadString);
-              $("#rh_out").html(data.h_h[data.h_h.length-1].toFixed(1));
+              $("#rh_out").html(data.h_h[data.h_h.length-1].toFixed(0));
               /*
               var t = data.t.map(a => a- Math.max(...data.t));
 
@@ -220,10 +220,10 @@
           }
           */
           if (message.destinationName == "breathe/lastbreathdt") {
-              $('#bpm_out').html( (60./parseFloat(message.payloadString)).toFixed(1) );
+              $('#bpm_out').html( (60./parseFloat(message.payloadString)).toFixed(0) );
           }
           if (message.destinationName == "breathe/minvent") {
-              $('#minvent').html(parseFloat(message.payloadString).toFixed(1));
+              $('#minvent').html(parseFloat(message.payloadString).toFixed(0));
           }
       }
 
