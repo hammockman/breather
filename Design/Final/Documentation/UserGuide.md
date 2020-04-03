@@ -1,4 +1,8 @@
-# AgVent User Guide
+--var fio2: FiO<sub>2</sub>
+--var vent: Manawa Ora
+
+
+# {{vent}} User Guide
 
 ## Revision History
 
@@ -30,20 +34,20 @@ purchase price of the defective unit.
 
 ## Notices
 
-The AgVent ventilator complies with XXX. It does however use and radiate radio frequency energy.
+The {{vent}} ventilator complies with XXX. It does however use and radiate radio frequency energy.
 
 The function of this machine may be adversely affected by the operation of other nearby equipment, such as high frequency surgical diathermy equipment, short-wave therapy equipment, defibrillators, or MRI equipment.
 
-The AgVent ventilator may emit and receive electromagnetic interference. Avoidance of this exposure is recommended whenever possible.
+The {{vent}} ventilator may emit and receive electromagnetic interference. Avoidance of this exposure is recommended whenever possible.
 
-The AgVent ventilator is not suitable for use in shielded magnetic scanners.
+The {{vent}} ventilator is not suitable for use in shielded magnetic scanners.
 
 
 > ** Notice To Operators**
 >
-> **Unsafe Operation** - Operating the AgVent ventilator without a complete and thorough understanding of its attributes is unsafe and may cause harm to the patient. It is important that this manual be read and understood in its entirety before operating the ventilator.
-> **Warnings and Cautions Section** - Read the section on Warnings and Cautions carefully before operating the AgVent ventilator.
-> **Use and Maintenance** - Any questions regarding installing, operating, or maintaining the AgVent ventilator, should be directed to a certified Manawa Ora service technician or Manawa Ora.
+> **Unsafe Operation** - Operating the {{vent}} ventilator without a complete and thorough understanding of its attributes is unsafe and may cause harm to the patient. It is important that this manual be read and understood in its entirety before operating the ventilator.
+> **Warnings and Cautions Section** - Read the section on Warnings and Cautions carefully before operating the {{vent}} ventilator.
+> **Use and Maintenance** - Any questions regarding installing, operating, or maintaining the {{vent}} ventilator, should be directed to a certified Manawa Ora service technician or Manawa Ora.
 
 
 ## Contents
@@ -51,7 +55,7 @@ The AgVent ventilator is not suitable for use in shielded magnetic scanners.
 
 ## 1 Introduction
 
-This Operator’s Manual contains detailed information and instructions which when adhered to ensure the safe and effective set up, use and simple maintenance of the AgVent ventilator.
+This Operator’s Manual contains detailed information and instructions which when adhered to ensure the safe and effective set up, use and simple maintenance of the {{vent}} ventilator.
 
 This manual is designed for use by Respiratory Therapists or other qualified and trained personnel
 under the direction of a physician and in accordance with applicable state laws and regulations. It
@@ -73,7 +77,7 @@ contains the following:
 
 ### WARNINGS
 
-**Untrained Personnel** Only properly trained personnel should operate the ventilator. The AgVent ventilator is a restricted medical device designed for use by Respiratory Therapists or other properly trained and qualified personnel under the direction of a physician and in accordance with applicable laws and regulations.
+**Untrained Personnel** Only properly trained personnel should operate the ventilator. The {{vent}} ventilator is a restricted medical device designed for use by Respiratory Therapists or other properly trained and qualified personnel under the direction of a physician and in accordance with applicable laws and regulations.
 
 **Leak Testing the Patient Breathing Circuit** The patient circuit must be leak tested before connection to the patient. In addition, correct operation of the ventilator alarm, displays and controls should also be checked. Harm to the patient or ineffective ventilation may result from failure to leak test the patient breathing circuit before connection to a patient.
 
@@ -85,7 +89,7 @@ contains the following:
 
 **Alternative Ventilation** It is recommended that an alternative means of ventilating the patient be available at all times and that all ventilator operators be fully familiar with emergency ventilation procedures.
 
-**Fire or Explosion** Operation of the AgVent ventilator in the presence of flammable gases could cause a fire or explosion. Under no circumstances is the ventilator to be operated when explosive gases are present. The presence of nitrous oxide or flammable anesthetics presents a danger to the patient and operator.
+**Fire or Explosion** Operation of the {{vent}} ventilator in the presence of flammable gases could cause a fire or explosion. Under no circumstances is the ventilator to be operated when explosive gases are present. The presence of nitrous oxide or flammable anesthetics presents a danger to the patient and operator.
 
 **Patient Breathing Circuit Disconnection** Inadvertent disconnection of the patient from the patient breathing circuit can be dangerous.
 
@@ -323,67 +327,65 @@ on the connector before removing it from the ventilator power port or the power 
 
 ## 2 Ventilator Overview
 
-The AgVent ventilator consists of:
+The {{vent}} ventilator system consists of:
 
-1.
+1. Main ventilator unit containing sensors and valves
+1. A single board computer control unit
+1. User interface screen
 
-[!]
+The ventilator system has the following features:
+
+* Low cost unit constructed from readily available parts in small lightweight package 
+* Controllable from any device with a web browser (computer, tablet, phone, etc) secured via serial number and password. More than one ventilator can be monitored and controlled from a single display.
+* Pressure Control ventilation mode
+* Optional triggering based on patient inhalation attempt
+* Oxygen enrichment based on a High-Pressure Oxygen source
+* Monitors for {{fio2}}
+* Real time displays of patient circuit pressure, flow and tidal volume
+* Can be operated from AC, internal battery and external DC power sources
+
+
+![prototype-system-photo-1](https://raw.githubusercontent.com/hammockman/breather/master//Design/Final/Documentation/system_with_pi_and_screen.jpg)
+
+![prototype-system-photo-2](https://raw.githubusercontent.com/hammockman/breather/master/Design/Final/Documentation/system_with_pi1.jpg)
+
+![prototype-system-photo-3](https://raw.githubusercontent.com/hammockman/breather/master/Design/Final/Documentation/system_with_pi2.jpg)
+
+![ventilator-cad-1](https://raw.githubusercontent.com/hammockman/breather/master/Design/Final/Documentation/CAD/Ventilator.jpg)
+
+![ventilator-cad-iso](https://raw.githubusercontent.com/hammockman/breather/master/Design/Final/Documentation/CAD/Ventilator-Iso.jpg)
+
 
 ## 3 Breath Types
+
+
 
 ## 4 Ventilation Modes
 
 ## 5 Using the Controls and Indicators
 
-## 6 Controls
+![Screenshot](https://raw.githubusercontent.com/hammockman/breather/master//Design/Final/Documentation/screenshot1.png)
 
-## 7 Displays and Indicators
+<!--## Controls
 
-## 9 Ventilator Alarms
+## Displays and Indicators-->
 
-## 10 Extended Features
-
-## 11 Ventilator Checkout Tests
-
-## 12 Operating Procedure
-
-## 13 Cleaning, Disinfecting and Sterilizing
-
-## 14 Power and Battery Operation
+## Ventilator Alarms
 
 
 
-## Appendix A - Ventilator Specifications 
+<!--## Extended Features-->
 
-## Appendix B - Set Up / Maintenance 
+## Ventilator Checkout Tests
 
-## Appendix C - Installation and Checkout 
-
-## Appendix D - Principles of Operation 
-
-## Appendix E - Event Trace 
-
-## Appendix F - Glossary 
-
-## Appendix G - Index
+## Operating Procedure
 
 
+Start the breathe app on the Raspbery pi.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## `breathe`: Raspberry Pi Control App 
+```
+$ python3 breathe.py
+```
 
 
 When `breathe` is started the flow meter configuration can be optionally supplied using the `--flow-meters` option, e.g. if both inhalation and exhalation flow meters are installed use:
@@ -393,6 +395,43 @@ $ python3 breathe.py --flow-meters=IE
 ```
 
 
+## Cleaning, Disinfecting and Sterilizing
+
+Do not immerse.
+
+Remove solenoids and sensors from the ventilator. Autoclave ventialto as usual. 
+
+Wipe solenoids and sensors down with appropriate sterilising solution.
+
+
+
+
+<!-- ## Power and Battery Operation -->
+
+## Troubleshooting
+
+| Symptoms | Potential Causes | Operator Actions
+| --- | --- | --- |
+| xxx | yyy | zzz |
+
+## Appendix A - Ventilator Specifications 
+
+## Appendix B - Set Up / Maintenance 
+
+## Appendix C - Installation and Checkout 
+
+
+
+<!-- 
+
+## Appendix D - Principles of Operation 
+
+## Appendix E - Event Trace 
+
+## Appendix F - Glossary 
+
+## Appendix G - Index
+-->
 
 
 
@@ -406,6 +445,24 @@ $ python3 breathe.py --flow-meters=IE
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
 
 
 
@@ -508,3 +565,5 @@ Markdown (MD) is a lightweight markup language with plain-text-formatting syntax
 
 ## Love Write.md?
 Why not leave us a review on product hunt to let others know how much you enjoy using Write.md https://www.producthunt.com/posts/write-md
+
+-->
