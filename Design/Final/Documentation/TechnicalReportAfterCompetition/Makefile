@@ -14,10 +14,10 @@ tn: TechnicalNoteAfterCompetition.md
 	gs -dNOPAUSE -sDEVICE=pdfwrite -sOUTPUTFILE=Ventilator_ManawaOra_TechnicalNoteAfterCompetition.pdf -dBATCH \
              main.pdf \
              app1.pdf \
-             ../Elec/PID_001.pdf \
-             ../Elec/LS-001.pdf \
-             ../Elec/E-001.pdf \
-             ../Elec/E-002.pdf \
-             ../Elec/InputOutput.pdf \
+             ../../Drawings/PID_001.pdf \
+             ../../Drawings/LS-001.pdf \
+             ../../Drawings/E-001.pdf \
+             ../../Drawings/E-002.pdf \
+             ../../Drawings/InputOutput.pdf \
              ../BillOfMaterials/Manufacturing\ BOM\ -\ Basic\ model.pdf \
              app3.pdf
