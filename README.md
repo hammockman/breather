@@ -4,3 +4,6 @@
 There is a competition going at
 https://www.agorize.com/en/challenges/code-life-challenge. We are now
 "participating" in a team called Manawa Ora. Quite high-falutin but hey.
+
+Links:
+* [Corona Virus Tech Handbook. Ventilator Chapter.](https://coronavirustechhandbook.com/ventilators)
