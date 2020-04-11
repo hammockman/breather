@@ -69,9 +69,10 @@ def read_all():
 
     p_h, t_h = bmp085_h.read()
     p_l, t_l = bmp085_l.read()
-    #sf = 5 # insp
-    sf = 10 # exp
-    q_h = sf*(read_ai0() - 31 + 8) # 31 seems to be zero flow.
+    # Scale factor, sf. 
+    #sf = 5 # When sensor is on inspiratory line.
+    sf = 10 # When sensor is on exppiratory line.
+    q_h = 5*(read_ai0() - 31) # 31 seems to be zero flow.
     
     return {
         't': time.time(),
