@@ -118,9 +118,9 @@ while True: # main control loop
     M.publish('breathe/bpm', bpm, retain=True) # eventually this will become the TRUE instantaneous breath rate c.f. backup bpm
 
     # check on bpm sanity
-    if bpm>20:
-        logging.warning('Requested bpm=%s > 20. Using bpm=20 instead', bpm)
-        bpm = 20
+    if bpm>35:
+        logging.warning('Requested bpm=%s > 35. Using bpm=35 instead', bpm)
+        bpm = 35
 
     # exit if instructed to
     if M.messages['breathe/runstate'] == 'quit':

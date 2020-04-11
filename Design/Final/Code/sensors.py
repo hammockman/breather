@@ -69,7 +69,9 @@ def read_all():
 
     p_h, t_h = bmp085_h.read()
     p_l, t_l = bmp085_l.read()
-    q_h = read_ai0() - 31 # 31 seems to be zero flow.
+    #sf = 5 # insp
+    sf = 10 # exp
+    q_h = sf*(read_ai0() - 31 + 8) # 31 seems to be zero flow.
     
     return {
         't': time.time(),
@@ -141,7 +143,7 @@ class SensorsThread(threading.Thread):
                         # start simple with just -ve 
                         current_val['tv_h'] = 0 # FIXME: patient INHALES instantaneously!!!
                     else:
-                        current_val['tv_h'] = self.current_values[-1]['tv_h'] - dtv
+                        current_val['tv_h'] = self.current_values[-1]['tv_h'] + dtv
                 else:
                     raise ValueError('Unknown value for installed_flow_meters=%s % self.installed_flow_meters')
             else:
@@ -165,9 +167,13 @@ class SensorsThread(threading.Thread):
                 self.send_to_valve(self.i_valve_id, u)
                 self.valves[self.e_valve_id].off()
             else:
-                self.send_to_valve(self.i_valve_id, 0)
+                self.send_to_valve(self.i_valve_id, -1)
                 self.valves[self.e_valve_id].on()
-            #if self.samples_recv%(selfs.current_values.maxlen//2)==0:
+                #if self.current_values[-1]['p_l'] > p_set_point_rl:
+                #    self.valves[self.e_valve_id].on()
+                #else:
+                #    self.valves[self.e_valve_id].off()
+                    #if self.samples_recv%(selfs.current_values.maxlen//2)==0:
             #    import pandas as pd
             #    print(pd.DataFrame(self.current_values)['t'].diff())
 

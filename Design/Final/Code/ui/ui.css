@@ -23,19 +23,21 @@ body {
 }
 
 #left-panel {
+    max-width: 15%;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
 }
 
 #right-panel {
+    max-width: 15%;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
 }
 
 .output {
-    font-size: 600%;
+    font-size: 200%;
     width: 4ex;
     height: 1em;
 }
