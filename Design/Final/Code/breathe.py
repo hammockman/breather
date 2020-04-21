@@ -73,7 +73,7 @@ M = MessagingThread(subscribe_to_topics)
 print(M.messages)
 fs = 15 # JH had 30
 maxnvalues = int(180*fs/5) # 5 bpm is as low as it'll ever go???
-S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.02, installed_flow_meters=run_opts.installed_flow_meters)
+S = SensorsThread(fs=fs, maxnvalues=maxnvalues, read_all_duration=.05, installed_flow_meters=run_opts.installed_flow_meters)
 #SlowS = SlowSensorsThread(fs=0.2, maxnvalues=10, read_all_duration=.5)
 # (fs,ms/sample): (1, 1.1) (2, .61) (3, .44) (5, .31) (10, .2) (100, .12)
 
@@ -92,8 +92,7 @@ def update_input(i):
 
 nbreaths = 0
 t0 = time() # t0 tracks the start of inspiration
-inspiration = True
-S.ie = 1
+S.inspiration = True
 S.p_set_point = float(update_input('inp'))
 M.publish('breathe/runstate','run'); sleep(2)
 this_breath_inspired_tv = None
@@ -130,31 +129,45 @@ while True: # main control loop
     # have we reached the end of the inspiration phase?
     # todo: get current flow rate
     t = time()
-    if inspiration:
-        flow = 100 #sensor_current_values['q_h'][-1]
+    """Need to have a good think about logic here. Some requirements:
+     
+     - Sensors (S) thread needs to be able to start a new breath in assist mode (and other modes?)
+
+     - Inspiration should be extended if patient wants it...pressure
+       will stay low so S will have to continue inspiration for longer
+       than 60/bpm/(1. + ieratio). This means that logic here shoul, possibly
+
+
+    Probably have to move some of this logic out to Sensors. And maybe
+rename sensors....
+
+    """
+    if S.inspiration:
+        flow = 100 #sensor_current_values['q_i'][-1]
+        # Why do we have flow < flowEps here? Shouldn't option of holding pressure without flow be there?
         if flow<flow_eps or t>t0 + 60/bpm/(1. + ieratio):
-            # force change over from ins- to ex-piration
-            inspiration = False
-            S.ie = -1
+            # force change over from inspiration to expiration
+            S.inspiration = not S.inspiration
             S.p_set_point = float(update_input('peep'))
-            this_breath_inspired_tv = sensor_current_values['tv_h'][-1]
+            this_breath_inspired_tv = sensor_current_values['tv_i'][-1]
     else: # we're in expiration phase
         # trigger a new breath?
-        exp_pressure = sensor_current_values['p_h'][-1] # p_l doesn't exist
+        exp_pressure = sensor_current_values['p_e'][-1]
         if (patrigmode and exp_pressure<0) or t>60/bpm:
+            
             nbreaths += 1
             dt = t - t0
             M.publish('breathe/lastbreathdt', dt, retain=True)
-            if this_breath_inspired_tv is not None: M.publish('breathe/minvent', this_breath_inspired_tv/dt, retain=True)
+            if this_breath_inspired_tv is not None:
+                M.publish('breathe/minvent', this_breath_inspired_tv/dt, retain=True)
             t0 = t
-            inspiration = True
-            S.ie = 1
+            S.inspiration = not S.inspiration
             S.p_set_point = float(update_input('inp'))
             continue
 
     #print(nbreaths, ieratio)
     
     # go to sleep for a bit
-    sleep(60/bpm/2) # was /5
+    sleep(60/bpm/2)
         
 

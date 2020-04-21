@@ -24,6 +24,7 @@ body {
 
 #left-panel {
     max-width: 15%;
+    min-width: 175px;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
@@ -43,10 +44,40 @@ body {
 }
 
 fieldset {
+    display: inline;
     background-color: white;
-    display: inline-block;
     border-radius: 5px;
+    padding: 10px 5px;
     margin: 10px 5px;
+}
+
+div.fieldset {
+    width: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center; //space-around;    
+}
+
+input[type=number] {
+    width: 50px;
+    font-size: 150%;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button {  
+
+  -webkit-appearance: none; 
+  margin: 0;
+
+}
+
+span.control {
+    width: 15px;
+    background-color: #e6faeb;
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-size: 150%;
 }
 
 .myplot {
@@ -58,6 +89,10 @@ fieldset {
     background-color: white;
     border: 2px solid threedface;
     border-radius: 10px;
+}
+
+volume-plot, #volume-plot {
+    display: none;
 }
 
 fio2-plot, #fio2-plot {
@@ -73,7 +108,7 @@ temp-plot, #temp-plot, #temp_out_fs {
 }
 
 .panel {
-    margin: 1em 2em;
+    margin: 1em 1%;
     padding: 1em;
     border: 2px solid threedface;
     border-radius: 10px;
@@ -88,9 +123,6 @@ h3 {
     margin-top: 0;
 }
 
-input {
-    font-size: 150%;
-}
 
 /*
 body {

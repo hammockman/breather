@@ -10,7 +10,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js" type="text/javascript"></script>
     <!-- Plotly: Latest compiled and minified plotly.js JavaScript -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js" charset="utf-8"></script>
+    <!-- Cool font -->
     <link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+    <script>
+      function inc(id) {
+	  document.getElementById(id).stepUp();
+      };
+      function dec(id) {
+	  document.getElementById(id).stepDown();
+      };
+    </script>
   </head>
   <body>
 
@@ -19,13 +28,58 @@
       <div id="left-panel" class="panel">
 	<h1>Manawa Ora</h1>
 	<h3>Breathe (ver. 0.3)</h3>
-        <fieldset><legend>Breath rate (b.p.m.)</legend><input type="number" min="5" max="20" step="0.1" id="bpm" onchange="publ(this)" value="12"></fieldset>
-        <fieldset><legend>Inspiration pressure (cm H2O)</legend><input type="number" min="10" max="40" step="0.5" id="inp" onchange="publ(this)" value="8"></fieldset>
-        <fieldset><legend>Expiratory pressure (PEEP) (cmH2O)</legend><input type="number" min="1" max="10" step="0.2" id="peep" onchange="publ(this)" value="5"></fieldset>
-        <fieldset><legend>I:E ratio</legend><input type="number" min="0.2" max="2" step="0.1" id="ieratio" onchange="publ(this)" value="1.2"></fieldset>
-        <!--<fieldset><legend>tidal volume (ml)</legend><input type="text" id="tv" onchange="publ(this)" ></fieldset>-->
-        <fieldset><legend>FiO2 (%)</legend><input type="number" min="22" max="100" step="5" id="fio2" onchange="publ(this)" value="22"></fieldset>
-        <fieldset><legend>Patient triggered</legend><input type="checkbox" id="patrigmode" onchange="publ(this)" ></fieldset>
+        <fieldset>
+	  <legend>Breath rate (b.p.m.)</legend>
+	  <div class="fieldset">
+	    <span class="control" onclick="dec('bpm')">&#8722;</span>
+	    <input type="number" min="5" max="20" step="0.1" id="bpm" onchange="publ(this)" value="12">
+	    <span class="control" onclick="inc('bpm')">&#43;</span>
+	  </div>
+	</fieldset>
+        <fieldset>
+	  <legend>Inspiration pressure (cm H2O)</legend>
+	  <div class="fieldset">
+	    <span class="control" onclick="dec('inp')">&#8722;</span>
+	    <input type="number" min="10" max="40" step="0.5" id="inp" onchange="publ(this)" value="8">
+	    <span class="control" onclick="inc('inp')">&#43;</span>
+	  </div>
+	</fieldset>
+        <fieldset>
+	  <legend>Expiratory pressure (PEEP) (cmH2O)</legend>
+	  <div class="fieldset">
+	    <span class="control" onclick="dec('peep')">&#8722;</span>
+	    <input type="number" min="1" max="10" step="0.2" id="peep" onchange="publ(this)" value="5">
+	    <span class="control" onclick="inc('peep')">&#43;</span>
+	  </div>
+	</fieldset>
+        <fieldset>
+	  <legend>I:E ratio</legend>
+	  <div class="fieldset">
+	    <span class="control" onclick="dec('ieratio')">&#8722;</span>
+	    <input type="number" min="0.2" max="2" step="0.1" id="ieratio" onchange="publ(this)" value="1.2">
+	    <span class="control" onclick="inc('ieratio')">&#43;</span>
+	  </div>
+	</fieldset>
+        <!--<fieldset>
+	    <legend>tidal volume (ml)</legend>
+	    <div class="fieldset">
+	      <span class="control" onclick="dec('tv')">&#8722;</span>
+	      <input type="text" id="tv" onchange="publ(this)" >
+	      <span class="control" onclick="inc('tv')">&#43;</span>
+	    </div>
+	</fieldset>-->
+        <fieldset>
+	  <legend>FiO2 (%)</legend>
+	  <div class="fieldset">
+	    <span class="control" onclick="dec('fio2')">&#8722;</span>
+	    <input type="number" min="22" max="100" step="2" id="fio2" onchange="publ(this)" value="22">
+	    <span class="control" onclick="inc('fio2')">&#43;</span>
+	  </div>
+	</fieldset>
+        <fieldset>
+	  <legend>Patient triggered</legend>
+	  <input type="checkbox" id="patrigmode" onchange="publ(this)" >
+	</fieldset>
         <input type="button" id="runstate" value="pause" onclick="toggle_runstate()">
         <!-- todo: alarm criteria -->
         <!-- todo: input validation -->
@@ -35,6 +89,7 @@
       <div id="center-panel" class="panel">
         <div class="myplot" id="pressure-plot"></div>
         <div class="myplot" id="flow-plot"></div>
+        <div class="myplot" id="control-plot"></div>
         <div class="myplot" id="volume-plot"></div>
         <!--<div class="myplot" id="fio2-plot"></div>-->
         <!--<div class="myplot" id="rh-plot"></div>-->
@@ -82,7 +137,8 @@
     
     <script>
 
-      var mqttHost = "manawa-ora-1";
+      //var mqttHost = "manawa-ora-1";
+      var mqttHost = "192.168.1.69";
       var client = new Paho.MQTT.Client(mqttHost, Number("9001"), "client-" + parseInt(10000*Math.random(),10));
 
       client.onMessageArrived = onMessageArrived;
@@ -111,7 +167,7 @@
       //var volume = [];
       
       function onMessageArrived(message) {
-          console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
+          //console.log("onMessageArrived:"+message.destinationName+" "+message.payloadString);
           if (message.destinationName == "breathe/nbreaths") {
               //var data = JSON.parse(message.payloadString);
               //$("#nbreaths").html(Math.round(data.value));
@@ -122,36 +178,48 @@
               var t = data.t.map(a => a- Math.max(...data.t));
 
               // air temp
-              //$("#temp_out").html(data.t_h[data.t_h.length-1].toFixed(0))
+              //$("#temp_out").html(data.t_i[data.t_i.length-1].toFixed(0))
               
               //todo: say goodbye to cut'n'paste
               // inspiration pressure
-              var y = data.p_h;
-              var y2 = data.p_l;
+              var y = data.p_i;
+              var y2 = data.p_e;
+              var y3 = data.y_s;
+              var y4 = data.y;
               var plot = [
-                  {
-                      x: t,
-                      y: y,
-                      type: 'scatter'
-                  },
-                  /*
-                  {
-                      x: t,
-                      y: y2,
-                      type: 'scatter'
-                  }
-                  */
+                  //{x: t, y: y,type: 'scatter'},
+                  //{x: t, y: y2, type: 'scatter'},
+                  //{x: t, y: y3, type: 'scatter'},
+                  {x: t, y: y4, type: 'scatter'}
               ];
               var layout = {
                   yaxis: {
+		      range: [-10, 60],
                       title: "Pressure (cm H2O)",
                   }
                   ,margin: {l: 80, r:20, b:20, t:0, pad:0}
               };
               Plotly.newPlot('pressure-plot', plot, layout);
 
+              // control pressure
+              var y1 = data.u;
+              var y2 = data.u_f;
+              var y3 = data.y_s;
+              var plot = [{x: t, y: y1, type: 'scatter'},
+			  {x: t, y: y2, type: 'scatter'},
+			  {x: t, y: y3, type: 'scatter'}
+			 ];
+              var layout = {
+                  yaxis: {
+		      range: [-0.5, 0.5],
+                      title: "Control signal ()",
+                  }
+                  ,margin: {l: 80, r:20, b:20, t:0, pad:0}
+              };
+              Plotly.newPlot('control-plot', plot, layout);
+
               // volume plot
-              var y = data.tv_h;
+              var y = data.tv_i;
               var plot = [
                   {
                       x: t,
@@ -169,7 +237,7 @@
 
               
               // inspiration flow rate
-              var y = data.q_h;
+              var y = data.q_i;
               var plot = [
                   {
                       x: t,
@@ -188,14 +256,14 @@
 	  if (message.destinationName == "breathe/slow_sensors/current") {
 
 	      // Why isn't data stacking up?
-              var data = JSON.parse(message.payloadString);
-              $("#rh_out").html(data.h_h[data.h_h.length-1].toFixed(0));
               /*
+              var data = JSON.parse(message.payloadString);
+              $("#rh_out").html(data.h_i[data.h_i.length-1].toFixed(0));
               var t = data.t.map(a => a- Math.max(...data.t));
 
               //todo: say goodbye to cut'n'paste
               // humidity
-              var y = data.h_h;
+              var y = data.h_i;
               var plot = [
                   {
                       x: t,

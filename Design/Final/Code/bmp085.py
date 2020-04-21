@@ -11,7 +11,7 @@ class BMP085():
         self.address = address
         self.bus = smbus.SMBus(bus)
 
-        self.p_amb = 987 # hPa or cm H20. Neee to get this from another sensor!
+        self.p_amb = 984 # hPa or cm H20. Neee to get this from another sensor!
         
         # Move this stuff out to init.
 
@@ -55,14 +55,18 @@ class BMP085():
         # Seems like we have to wait between write and read. 0.003 s seems 
         # like a minimum. Can't make this sequential?
         # Read raw temperature
-        self.write_byte(0xF4, 0x2E)
-        time.sleep(0.004)
-        temp_raw = self.read_word_2c(0xF6)
+        try:
+            self.write_byte(0xF4, 0x2E)
+            time.sleep(0.003)
+            temp_raw = self.read_word_2c(0xF6)
 
-        self.write_byte(0xF4, 0x34 + (self.oss << 6))
-        time.sleep(0.004)
-        pressure_raw = ((self.read_byte(0xF6) << 16) + (self.read_byte(0xF7) << 8) + (self.read_byte(0xF8)) ) >> (8-self.oss)
+            self.write_byte(0xF4, 0x34 + (self.oss << 6))
+            time.sleep(0.003)
+            pressure_raw = ((self.read_byte(0xF6) << 16) + (self.read_byte(0xF7) << 8) + (self.read_byte(0xF8)) ) >> (8-self.oss)
 
+        except IOError as e:
+            print('BMP085 error! ', e)
+            return 0, 0
 
 
         #print("Raw temp:", temp_raw)

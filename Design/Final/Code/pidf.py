@@ -7,7 +7,7 @@ class PIDF():
     '''
     def __init__(self, p=0., i=0., d=0., f=0., \
                      iLimits=np.array([-np.inf, np.inf]), \
-                     maxOutput=np.inf):
+                     uLimits=np.array([-np.inf, np.inf])):
         ''' Initialise by setting none, some or all of the PIDF
         parameters. The integrator limits and mximum output can also be
         set here.
@@ -29,7 +29,8 @@ class PIDF():
         
         self.iMin = iLimits[0]
         self.iMax = iLimits[1]
-        self.maxOutput = maxOutput
+        self.minOutput = uLimits[0]
+        self.maxOutput = uLimits[1]
         
     def __str__(self):
         ''' Print a string of the current settings.
@@ -60,8 +61,14 @@ class PIDF():
         
         self.u = self.p + self.i + self.d + self.f
         #print self.p, self.i, self.d, self.f, output
+        # Was:
+        #if self.u > self.maxOutput:
+        #    return self.maxOutput
+        #else:
+        #    return self.u
+        if self.u < self.minOutput:
+            self.u = self.minOutput
         if self.u > self.maxOutput:
-            return self.maxOutput
-        else:
-            return self.u
+            self.u = self.maxOutput
+        return self.u
           

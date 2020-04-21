@@ -27,5 +27,5 @@ Units er units/seconds.
     else:
       self.y = yRaw
 
-    print(yRaw, self.y, (yRaw - self.y) / self.dt)
+    #print(yRaw, self.y, (yRaw - self.y) / self.dt)
     return self.y;

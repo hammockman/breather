@@ -9,7 +9,7 @@ from bmp085 import BMP085
 t_sec = time.localtime().tm_sec
 t_sec_old = t_sec
 n = 0
-pSensor = BMP085(address=0x77)
+pSensor = BMP085(bus=1, address=0x77)
 while 1:
   t_sec = time.localtime().tm_sec
   p_h, t_h = pSensor.read()
